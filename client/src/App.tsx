@@ -10,7 +10,7 @@ function App() {
     <>
       <div className="App">
         <header className="App-header">
-          <h1>Welcome to My App</h1>
+          <h1>Bidding App</h1>
           <GoogleSignIn/>
         </header>
       </div>
