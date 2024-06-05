@@ -1,8 +1,11 @@
 // src/context/UserContext.js
 import React, { createContext, useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db } from '../config/firebase';
 import { getDoc, doc, setDoc } from "firebase/firestore";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { googleProvider } from "../config/firebase";
+
 const AuthContext = createContext(null);
 
 const AuthContextProvider = ({ children }) => {
@@ -32,8 +35,33 @@ const AuthContextProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  const googleSignIn = async () => {
+    const auth = getAuth();
+    await signInWithPopup(auth, googleProvider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+        console.log('User:', user);
+        console.log('Token:', token);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.error('Error:', errorCode, errorMessage, email, credential);
+      });
+  }
+
+  const googleSignOut = async () => {
+    const auth = getAuth();
+    setUser(null)
+    await signOut(auth)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, googleSignIn, googleSignOut }}>
       {children}
     </AuthContext.Provider>
   );
