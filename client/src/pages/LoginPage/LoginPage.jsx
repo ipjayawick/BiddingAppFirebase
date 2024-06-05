@@ -61,6 +61,7 @@ const GoogleSignIn = () => {
       <Button variant="contained" onClick={sendAddMessage}>send message</Button>
       <Button variant="contained" onClick={showUser}>Show user</Button>
       <Button variant="contained" onClick={handleLogOut}>Logout</Button>
+      <Button variant="contained" href='/biddingPage'>Go to bidding page</Button>
     </>
   );
 };

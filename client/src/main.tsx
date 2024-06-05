@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage/LoginPage.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import BiddingPage from './pages/biddingPage/biddingPage.jsx'
 import { AuthContextProvider } from './context/AuthContext.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -12,7 +13,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/biddingPage',
-    element: <BiddingPage />
+    element: (
+      <ProtectedRoute>
+        <BiddingPage />
+      </ProtectedRoute>
+    )
   }
 ])
 
