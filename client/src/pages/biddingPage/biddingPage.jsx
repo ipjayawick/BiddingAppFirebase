@@ -9,6 +9,7 @@ import UserCard from '../../components/UserCard'
 import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
 import BiddingTable from '../../components/BiddingTable'
+
 const BiddingPage = ({ companyId }) => {
   const [bidStatus, setBidStatus] = useState('');
   const { user } = useContext(AuthContext)
