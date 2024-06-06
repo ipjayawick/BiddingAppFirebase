@@ -19,7 +19,7 @@ import { useEffect } from 'react';
 import { getDocs, collection, query, onSnapshot } from 'firebase/firestore';
 import { Button } from '@mui/material';
 
-function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingPoints, userName, userId) {
+function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingPoints, bidders) {
   return {
     companyId,
     companyName,
@@ -27,16 +27,7 @@ function createData(companyId, companyName, description, totalVacancies, remaini
     totalVacancies,
     remainingVacancies,
     biddingPoints,
-    bidders: [
-      {
-        userName: 'isuru',
-        userId: '200',
-      },
-      {
-        userName: 'malith',
-        userId: '300',
-      },
-    ],
+    bidders
   };
 }
 
@@ -62,7 +53,7 @@ function Row({ row, updateCompany, updateUser }) {
         <TableCell align="right">{row.totalVacancies}</TableCell>
         <TableCell align="right">{row.remainingVacancies}</TableCell>
         <TableCell align="right">{row.biddingPoints}</TableCell>
-        <TableCell align="right">  <Button variant="contained" color="primary" onClick={()=>{updateCompany(row.companyId); updateUser(row.companyName);}}>Bid</Button></TableCell>
+        <TableCell align="right">  <Button variant="contained" color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row.companyName); }}>Bid</Button></TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -79,7 +70,7 @@ function Row({ row, updateCompany, updateUser }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.bidders.map((biddersRow) => (
+                  {row.bidders?.map((biddersRow) => (
                     <TableRow key={biddersRow.userId}>
                       <TableCell component="th" scope="row">
                         {biddersRow.userName}
@@ -97,45 +88,51 @@ function Row({ row, updateCompany, updateUser }) {
   );
 }
 
-export default function BiddingTable({ updateCompany,updateUser }) {
+export default function BiddingTable({ updateCompany, updateUser }) {
   const [rows, setRows] = useState([])
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
     const q = query(collection(db, "companies"));
-
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const updatedCompanies = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const row = createData(doc.id, data.companyName, data.description, data.totalVacancies, data.remainingVacancies, data.biddingMargin, "isuru", "200");
+        const row = createData(doc.id, data.companyName, data.description, data.totalVacancies, data.remainingVacancies, data.biddingMargin, data.bidders);
         updatedCompanies.push(row);
       });
       setRows(updatedCompanies);
+      setLoading(false)
     });
 
     return () => unsubscribe(); // Clean up the listener on unmount
   }, []);
 
-
-  return (
-    <TableContainer component={Paper}>
-      <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow>
-            <TableCell />
-            <TableCell>Company</TableCell>
-            <TableCell align="right">Description</TableCell>
-            <TableCell align="right">Total Vacancies</TableCell>
-            <TableCell align="right">Remaining Vancies</TableCell>
-            <TableCell align="right">Bidding Points</TableCell>
-            <TableCell align="right">Bid</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser}/>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+  if (!loading) {
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell>Company</TableCell>
+              <TableCell align="right">Description</TableCell>
+              <TableCell align="right">Total Vacancies</TableCell>
+              <TableCell align="right">Remaining Vancies</TableCell>
+              <TableCell align="right">Bidding Points</TableCell>
+              <TableCell align="right">Bid</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  } else {
+    <>
+      Loading...
+    </>
+  }
 }

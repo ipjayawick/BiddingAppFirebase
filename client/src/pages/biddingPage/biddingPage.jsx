@@ -18,14 +18,18 @@ const BiddingPage = ({ companyId }) => {
     const userRef = doc(db, "users", user.uid)
     await updateDoc(userRef, {
       remainingBiddingPoints: increment(-10),
-      companies:arrayUnion(companyName)
+      companies: arrayUnion(companyName)
     })
   }
 
   const updateCompany = async (companyId) => {
     const companyRef = doc(db, "companies", companyId)
     await updateDoc(companyRef, {
-      remainingVacancies: increment(-1)
+      remainingVacancies: increment(-1),
+      bidders: arrayUnion({
+        userId: user.uid,
+        userName: user.displayName
+      })
     })
   }
 

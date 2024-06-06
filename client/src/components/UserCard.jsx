@@ -39,13 +39,13 @@ export default function OutlinedCard() {
         <>
             <Card variant="outlined" sx={{ maxWidth: 360 }}>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', p: 2,pb:0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 0 }}>
                     <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }} src={userAuth.photoURL} />
                     <Typography variant="h6" component="div">
                         {userAuth.displayName}
                     </Typography>
                 </Box>
-                <Divider sx={{mt:2}}/>
+                <Divider sx={{ mt: 2 }} />
                 {loading ? (
                     <>
                         Loading...
@@ -64,18 +64,18 @@ export default function OutlinedCard() {
                         </Box>
                         <Divider />
                         <Box sx={{ p: 2, pt: 0 }}>
-                            <Typography gutterBottom variant="h6" component="div" sx={{mb:0}}>
+                            <Typography gutterBottom variant="h6" component="div" sx={{ mb: 0 }}>
                                 Companies
                             </Typography>
                             <Stack spacing={1}>
-                                <List sx={{pt:0}}>
-                                    {user.companies.map((company) => (
-                                        <>
-                                            <ListItem key={company} sx={{py:0 , pt:1}}>
+                                <List sx={{ pt: 0 }}>
+                                    {user.companies.map((company, index) => (
+                                        <React.Fragment key={index}>
+                                            <ListItem sx={{ py: 0, pt: 1 }}>
                                                 <ListItemText primary={company} />
                                             </ListItem>
                                             <Divider variant="middle" component="li" />
-                                        </>
+                                        </React.Fragment>
                                     )
                                     )}
                                 </List>
