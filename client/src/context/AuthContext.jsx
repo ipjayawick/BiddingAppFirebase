@@ -15,11 +15,11 @@ const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userDoc = await getDoc(doc(db, 'user', user.uid));
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           setUser({ ...user, ...userDoc.data() });
         } else {
-          await setDoc(doc(db, 'user', user.uid), {
+          await setDoc(doc(db, 'users', user.uid), {
             displayName: user.displayName,
             email: user.email,
             createdAt: new Date()

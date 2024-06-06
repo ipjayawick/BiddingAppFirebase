@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './pages/LoginPage/App.tsx'
 import LoginPage from './pages/LoginPage/LoginPage.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import BiddingPage from './pages/biddingPage/biddingPage.jsx'
