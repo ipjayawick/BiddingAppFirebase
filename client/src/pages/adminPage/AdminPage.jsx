@@ -11,7 +11,7 @@ function AdminPage() {
         companyName,
         description,
         totalVacancies,
-        remaningVacancies:totalVacancies,
+        remainingVacancies:totalVacancies,
         biddingMargin
       });
     } catch (error) {

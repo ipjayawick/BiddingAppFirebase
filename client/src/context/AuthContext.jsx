@@ -22,7 +22,9 @@ const AuthContextProvider = ({ children }) => {
           await setDoc(doc(db, 'users', user.uid), {
             displayName: user.displayName,
             email: user.email,
-            createdAt: new Date()
+            initialBiddingPoints:100,
+            remainingBiddingPoints:100,
+            createdAt: new Date(),
           })
           setUser(user);
           console.log('setting user')

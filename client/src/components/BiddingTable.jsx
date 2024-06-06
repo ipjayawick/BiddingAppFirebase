@@ -19,13 +19,13 @@ import { useEffect } from 'react';
 import { getDocs, collection, query, onSnapshot } from 'firebase/firestore';
 import { Button } from '@mui/material';
 
-function createData(companyId, companyName, description, totalVacancies, remainingVancies, biddingPoints, userName, userId) {
+function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingPoints, userName, userId) {
   return {
     companyId,
     companyName,
     description,
     totalVacancies,
-    remainingVancies,
+    remainingVacancies,
     biddingPoints,
     bidders: [
       {
@@ -40,7 +40,7 @@ function createData(companyId, companyName, description, totalVacancies, remaini
   };
 }
 
-function Row({ row }) {
+function Row({ row, updateCompany, updateUser }) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -60,9 +60,9 @@ function Row({ row }) {
         </TableCell>
         <TableCell align="right">{row.description}</TableCell>
         <TableCell align="right">{row.totalVacancies}</TableCell>
-        <TableCell align="right">{row.remainingVancies}</TableCell>
+        <TableCell align="right">{row.remainingVacancies}</TableCell>
         <TableCell align="right">{row.biddingPoints}</TableCell>
-        <TableCell align="right">  <Button variant="contained" color="primary">Bid</Button></TableCell>
+        <TableCell align="right">  <Button variant="contained" color="primary" onClick={()=>{updateCompany(row.companyId); updateUser(row.companyName);}}>Bid</Button></TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -97,7 +97,7 @@ function Row({ row }) {
   );
 }
 
-export default function BiddingTable() {
+export default function BiddingTable({ updateCompany,updateUser }) {
   const [rows, setRows] = useState([])
   useEffect(() => {
     const q = query(collection(db, "companies"));
@@ -106,7 +106,7 @@ export default function BiddingTable() {
       const updatedCompanies = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const row = createData(doc.id, data.name, data.description, data.totalVacancies, data.remainingVacancies, data.biddingMargin, "isuru", "200");
+        const row = createData(doc.id, data.companyName, data.description, data.totalVacancies, data.remainingVacancies, data.biddingMargin, "isuru", "200");
         updatedCompanies.push(row);
       });
       setRows(updatedCompanies);
@@ -132,7 +132,7 @@ export default function BiddingTable() {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <Row key={row.companyId} row={row} />
+            <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser}/>
           ))}
         </TableBody>
       </Table>
