@@ -1,29 +1,12 @@
-import React from 'react'
+import React from 'react';
 import AddCompany from '../../components/AddCompany'
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../../config/firebase';
 
 function AdminPage() {
-
-  const addCompany = async (companyName, description, biddingMargin, totalVacancies) => {
-    try {
-      await addDoc(collection(db, "companies",), {
-        companyName,
-        description,
-        totalVacancies,
-        remainingVacancies:totalVacancies,
-        biddingMargin
-      });
-    } catch (error) {
-      console.error('Error adding company to Firestore:', error);
-    }
-  };
-
   return (
     <div>
-      <AddCompany addCompany={addCompany} />
+      <AddCompany />
     </div>
-  )
+  );
 }
 
-export default AdminPage
+export default AdminPage;

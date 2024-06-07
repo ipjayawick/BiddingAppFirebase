@@ -1,12 +1,30 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Box, Card, CardContent, Typography } from '@mui/material';
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { addDoc,collection } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
-export default function CompanyForm({ addCompany }) {
+export default function AddCompany() {
     const [companyName, setCompanyName] = useState('');
     const [description, setDescription] = useState('');
     const [biddingMargin, setBiddingMargin] = useState('');
     const [totalVacancies, setTotalVacancies] = useState('');
 
+    const [open, setOpen] = useState(false);
+
+    const addCompany = async (companyName, description, biddingMargin, totalVacancies) => {
+        try {
+          await addDoc(collection(db, "companies",), {
+            companyName,
+            description,
+            totalVacancies,
+            remainingVacancies: totalVacancies,
+            biddingMargin
+          });
+        } catch (error) {
+          console.error('Error adding company to Firestore:', error);
+        }
+      };
+      
     const handleSubmit = async (event) => {
         event.preventDefault();
         await addCompany(companyName, description, +biddingMargin, +totalVacancies)
@@ -16,56 +34,68 @@ export default function CompanyForm({ addCompany }) {
         setTotalVacancies('');
     };
 
+    const handleClickOpen = () => {
+        setOpen(true);
+      };
+    
+      const handleClose = () => {
+        setOpen(false);
+      };
+
     return (
-        <Container maxWidth="sm">
-            <Box sx={{ mt: 4 }}>
-                <Card>
-                    <CardContent>
-                        <Typography variant="h5" component="div" mb={3}>
-                            Add Company
-                        </Typography>
-                        <form onSubmit={handleSubmit}>
-                            <TextField
-                                label="Company Name"
-                                fullWidth
-                                value={companyName}
-                                onChange={(e) => setCompanyName(e.target.value)}
-                                margin="normal"
-                                required
-                            />
-                            <TextField
-                                label="Description"
-                                fullWidth
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                margin="normal"
-                                required
-                            />
-                            <TextField
-                                label="Bidding Margin"
-                                fullWidth
-                                type="number"
-                                value={biddingMargin}
-                                onChange={(e) => setBiddingMargin(e.target.value)}
-                                margin="normal"
-                                required
-                            />
-                            <TextField
-                                label="Total Vacancies"
-                                fullWidth
-                                type="number"
-                                value={totalVacancies}
-                                onChange={(e) => setTotalVacancies(e.target.value)}
-                                margin="normal"
-                                required
-                            />
-                            <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                                Submit
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            </Box>
-        </Container>
+        <>
+            <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                Add Company
+            </Button>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Register</DialogTitle>
+                <DialogContent>
+                    <form>
+                        <TextField
+                            label="Company Name"
+                            fullWidth
+                            value={companyName}
+                            onChange={(e) => setCompanyName(e.target.value)}
+                            margin="normal"
+                            required
+                        />
+                        <TextField
+                            label="Description"
+                            fullWidth
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            margin="normal"
+                            required
+                        />
+                        <TextField
+                            label="Bidding Margin"
+                            fullWidth
+                            type="number"
+                            value={biddingMargin}
+                            onChange={(e) => setBiddingMargin(e.target.value)}
+                            margin="normal"
+                            required
+                        />
+                        <TextField
+                            label="Total Vacancies"
+                            fullWidth
+                            type="number"
+                            value={totalVacancies}
+                            onChange={(e) => setTotalVacancies(e.target.value)}
+                            margin="normal"
+                            required
+                        />
+                    </form>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSubmit} color="primary">
+                        Submit
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 }
