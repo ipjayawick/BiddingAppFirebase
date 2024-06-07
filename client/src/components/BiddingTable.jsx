@@ -17,7 +17,7 @@ import { db } from '../config/firebase';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { getDocs, collection, query, onSnapshot } from 'firebase/firestore';
-import { Button } from '@mui/material';
+import { Button, Stack, TextField } from '@mui/material';
 
 function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingPoints, bidders) {
   return {
@@ -90,6 +90,9 @@ function Row({ row, updateCompany, updateUser }) {
 
 export default function BiddingTable({ updateCompany, updateUser }) {
   const [rows, setRows] = useState([])
+  const [search, setSearch] = useState('')
+
+  console.log(search)
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     const q = query(collection(db, "companies"));
@@ -109,30 +112,39 @@ export default function BiddingTable({ updateCompany, updateUser }) {
 
   if (!loading) {
     return (
-      <TableContainer component={Paper}>
-        <Table aria-label="collapsible table">
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell>Company</TableCell>
-              <TableCell align="right">Description</TableCell>
-              <TableCell align="right">Total Vacancies</TableCell>
-              <TableCell align="right">Remaining Vancies</TableCell>
-              <TableCell align="right">Bidding Points</TableCell>
-              <TableCell align="right">Bid</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box display="flex" flexDirection="column">
+        <Stack direction="row" alignItems="baseline" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Typography variant="h4">Companies</Typography>
+          <TextField id="standard-basic" label="Search Company" variant="standard" onChange={(e) => { setSearch(e.target.value) }} />
+        </Stack>
+        <TableContainer component={Paper}>
+          <Table aria-label="collapsible table">
+            <TableHead>
+              <TableRow>
+                <TableCell />
+                <TableCell>Company</TableCell>
+                <TableCell align="right">Description</TableCell>
+                <TableCell align="right">Total Vacancies</TableCell>
+                <TableCell align="right">Remaining Vancies</TableCell>
+                <TableCell align="right">Bidding Points</TableCell>
+                <TableCell align="right">Bid</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.
+                filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().includes(search)).
+                map((row) => (
+                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} />
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box >
     );
   } else {
     <>
       Loading...
     </>
+
   }
 }

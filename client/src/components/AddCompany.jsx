@@ -58,6 +58,7 @@ export default function AddCompany() {
                             onChange={(e) => setCompanyName(e.target.value)}
                             margin="normal"
                             required
+                            variant="standard"
                         />
                         <TextField
                             label="Description"
@@ -66,6 +67,7 @@ export default function AddCompany() {
                             onChange={(e) => setDescription(e.target.value)}
                             margin="normal"
                             required
+                            variant="standard"
                         />
                         <TextField
                             label="Bidding Margin"
@@ -75,6 +77,7 @@ export default function AddCompany() {
                             onChange={(e) => setBiddingMargin(e.target.value)}
                             margin="normal"
                             required
+                            variant="standard"
                         />
                         <TextField
                             label="Total Vacancies"
@@ -84,6 +87,7 @@ export default function AddCompany() {
                             onChange={(e) => setTotalVacancies(e.target.value)}
                             margin="normal"
                             required
+                            variant="standard"
                         />
                     </form>
                 </DialogContent>
