@@ -5,13 +5,18 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
 import TableRow from '@mui/material/TableRow';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { collection, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Box, Stack, TextField, Typography, Button } from '@mui/material';
 import UpdateCompany from './UpdateCompany';
+import AddCompany from './AddCompany';
 function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingMargin, bidders) {
     return {
         companyId,
@@ -23,11 +28,73 @@ function createData(companyId, companyName, description, totalVacancies, remaini
         bidders
     };
 }
+
+function Row({ row, deleteCompany }) {
+    const [open, setOpen] = React.useState(false);
+
+    return (
+        <React.Fragment>
+            <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                <TableCell>
+                    <IconButton
+                        aria-label="expand row"
+                        size="small"
+                        onClick={() => setOpen(!open)}
+                    >
+                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                </TableCell>
+                <TableCell component="th" scope="row">
+                    {row.companyName}
+                </TableCell>
+                <TableCell align="right">{row.description}</TableCell>
+                <TableCell align="right">{row.totalVacancies}</TableCell>
+                <TableCell align="right">{row.remainingVacancies}</TableCell>
+                <TableCell align="right">{row.biddingMargin}</TableCell>
+                <TableCell align="right">
+                    <UpdateCompany companyData={row} />
+                </TableCell>
+                <TableCell align="right">
+                    <Button variant="contained" color="error" onClick={() => deleteCompany(row.companyId)}>Delete</Button>
+                </TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Box sx={{ margin: 1 }}>
+                            <Typography variant="h6" gutterBottom component="div">
+                                Users
+                            </Typography>
+                            <Table size="small" aria-label="purchases">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>User</TableCell>
+                                        <TableCell>ID</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {row.bidders?.map((biddersRow) => (
+                                        <TableRow key={biddersRow.userId}>
+                                            <TableCell component="th" scope="row">
+                                                {biddersRow.userName}
+                                            </TableCell>
+                                            <TableCell>{biddersRow.userId}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Box>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+        </React.Fragment>
+    );
+}
+
 export default function CompnayTable() {
     const [rows, setRows] = useState([])
     const [search, setSearch] = useState('')
 
-    console.log(search)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const q = query(collection(db, "companies"));
@@ -62,12 +129,16 @@ export default function CompnayTable() {
         <Box display="flex" flexDirection="column">
             <Stack direction="row" alignItems="baseline" justifyContent="space-between" sx={{ mb: 2 }}>
                 <Typography variant="h4">Companies</Typography>
-                <TextField id="standard-basic" label="Search Company" variant="standard" onChange={(e) => { setSearch(e.target.value) }} />
+                <Stack direction="row" alignItems="baseline">
+                    <AddCompany />
+                    <TextField sx={{ ml: 2 }} id="standard-basic" label="Search Company" variant="standard" onChange={(e) => { setSearch(e.target.value) }} />
+                </Stack>
             </Stack>
             <TableContainer sx={{ maxHeight: 440 }} component={Paper}>
-                <Table stickyHeader aria-label="sticky table">
+                <Table aria-label="collapsible table">
                     <TableHead>
                         <TableRow>
+                            <TableCell />
                             <TableCell>Company</TableCell>
                             <TableCell align="right">Description</TableCell>
                             <TableCell align="right">Total Vacancies</TableCell>
@@ -80,21 +151,9 @@ export default function CompnayTable() {
                     <TableBody>
                         {rows.
                             filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().includes(search)).
-                            map((row, index) => {
-                                return (
-                                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                                        <TableCell component="th" scope="row">{row.companyName}</TableCell>
-                                        <TableCell align="right">{row.description}</TableCell>
-                                        <TableCell align="right">{row.totalVacancies}</TableCell>
-                                        <TableCell align="right">{row.remainingVacancies}</TableCell>
-                                        <TableCell align="right">{row.biddingMargin}</TableCell>
-                                        <TableCell align="right">
-                                            <UpdateCompany companyData={row} />
-                                        </TableCell>
-                                        <TableCell align="right">  <Button variant="contained" color="error" onClick={() => deleteCompany(row.companyId)}>Delete</Button></TableCell>
-                                    </TableRow>
-                                );
-                            })}
+                            map((row) => (
+                                <Row key={row.companyId} row={row} deleteCompany={deleteCompany} />
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>

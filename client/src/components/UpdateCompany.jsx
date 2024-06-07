@@ -36,7 +36,6 @@ export default function UpdateCompany({ companyData }) {
     };
 
     const handleSubmit = async (event) => {
-        console.log(description, +totalVacancies, +remainingVacancies, +biddingMargin)
         event.preventDefault();
         await updateCompany(description, +totalVacancies, +remainingVacancies, +biddingMargin)
         setCompanyName('');

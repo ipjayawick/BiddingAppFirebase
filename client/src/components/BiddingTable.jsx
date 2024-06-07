@@ -92,7 +92,6 @@ export default function BiddingTable({ updateCompany, updateUser }) {
   const [rows, setRows] = useState([])
   const [search, setSearch] = useState('')
 
-  console.log(search)
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     const q = query(collection(db, "companies"));
