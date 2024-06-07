@@ -12,12 +12,13 @@ export default function AddCompany() {
     const [open, setOpen] = useState(false);
 
     const addCompany = async (companyName, description, biddingMargin, totalVacancies) => {
+        const remainingVacancies=totalVacancies
         try {
           await addDoc(collection(db, "companies",), {
             companyName,
             description,
             totalVacancies,
-            remainingVacancies: totalVacancies,
+            remainingVacancies,
             biddingMargin
           });
         } catch (error) {
