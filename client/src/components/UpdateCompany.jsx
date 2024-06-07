@@ -43,6 +43,7 @@ export default function UpdateCompany({ companyData }) {
         setDescription('');
         setBiddingMargin('');
         setTotalVacancies('');
+        setOpen(false)
     };
 
     const handleClickOpen = () => {

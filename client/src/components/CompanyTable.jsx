@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { collection, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Box, Stack, TextField, Typography, Button } from '@mui/material';
 import UpdateCompany from './UpdateCompany';
@@ -44,6 +44,14 @@ export default function CompnayTable() {
 
         return () => unsubscribe(); // Clean up the listener on unmount
     }, []);
+
+    const deleteCompany = async (companyId) => {
+        try {
+            await deleteDoc(doc(db, "companies", companyId));
+        } catch (error) {
+            console.error('Error Deleting company :', error);
+        }
+    }
 
     if (loading) {
         return (<>
@@ -83,7 +91,7 @@ export default function CompnayTable() {
                                         <TableCell align="right">
                                             <UpdateCompany companyData={row} />
                                         </TableCell>
-                                        <TableCell align="right">  <Button variant="contained" color="error">Delete</Button></TableCell>
+                                        <TableCell align="right">  <Button variant="contained" color="error" onClick={() => deleteCompany(row.companyId)}>Delete</Button></TableCell>
                                     </TableRow>
                                 );
                             })}

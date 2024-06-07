@@ -33,6 +33,7 @@ export default function AddCompany() {
         setDescription('');
         setBiddingMargin('');
         setTotalVacancies('');
+        setOpen(false)
     };
 
     const handleClickOpen = () => {
