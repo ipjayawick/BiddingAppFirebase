@@ -15,7 +15,7 @@ const BiddingPage = ({ companyId }) => {
   const { user } = useContext(AuthContext)
 
   const updateUser = async (companyData) => {
-    const userRef = doc(db, "users", user.uid)
+    const userRef = doc(db, "users", user.userId)
     await updateDoc(userRef, {
       remainingBiddingPoints: increment(-companyData.biddingPoints),
       companies: arrayUnion(companyData.companyName)
@@ -25,15 +25,14 @@ const BiddingPage = ({ companyId }) => {
   const updateCompany = async (companyId) => {
     const companyRef = doc(db, "companies", companyId)
     await updateDoc(companyRef, {
-      [`bidders.${user.uid}`]: {
-        userId: user.uid,
+      [`bidders.${user.userId}`]: {
+        userId: user.userId,
         userName: user.displayName
       },
       remainingVacancies: increment(-1),
     })
   }
 
-  
   return (
     <Container sx={{ mt: 10 }}>
       <Grid container spacing={2}>

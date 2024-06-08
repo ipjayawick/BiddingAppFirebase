@@ -1,21 +1,33 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth, googleProvider } from "../../config/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import Button from '@mui/material/Button';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom';
 
 const GoogleSignIn = () => {
   const { user, loading, googleSignIn, googleSignOut } = useContext(AuthContext)
   const navigate = useNavigate()
 
+  // useEffect(() => {
+  //   if (user) {
+  //     console.log('user here')
+  //     navigate('/biddingPage')
+  //   }
+  // }, [])
+
   const functions = getFunctions();
   connectFunctionsEmulator(functions, "127.0.0.1", 5001);
   const addMessage = httpsCallable(functions, 'addMessage');
   const messageText = "hello"
+  const viewCurrentUser = () => {
+    console.log(getAuth().currentUser)
+  }
 
   const showUser = () => {
+    console.log(window.location.pathname)
     console.log(user)
     console.log(loading)
   }
@@ -30,15 +42,13 @@ const GoogleSignIn = () => {
         console.log(sanitizedMessage + "resoponse")
       });
   }
-  
+
   const handleLogin = async () => {
     try {
       await googleSignIn()
     } catch (error) {
       console.log(error)
     }
-    navigate('/biddingPage')
-
   };
 
   const handleLogOut = async () => {
@@ -50,9 +60,6 @@ const GoogleSignIn = () => {
     console.log(user)
   };
 
-  const viewCurrentUser = () => {
-    console.log(getAuth().currentUser)
-  }
 
   return (
     <>

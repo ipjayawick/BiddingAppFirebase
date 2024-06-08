@@ -10,7 +10,11 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <LoginPage />
+    element: (
+      <ProtectedRoute>
+        <LoginPage />
+      </ProtectedRoute>
+    )
   },
   {
     path: '/biddingPage',
