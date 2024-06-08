@@ -12,7 +12,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { collection, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore';
+import { arrayRemove, collection, deleteDoc, deleteField, doc, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Box, Stack, TextField, Typography, Button } from '@mui/material';
 import UpdateCompany from './UpdateCompany';
@@ -29,7 +29,7 @@ function createData(companyId, companyName, description, totalVacancies, remaini
     };
 }
 
-function Row({ row, deleteCompany }) {
+function Row({ row, deleteCompany, removeBidderFromCompany }) {
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -70,15 +70,19 @@ function Row({ row, deleteCompany }) {
                                     <TableRow>
                                         <TableCell>User</TableCell>
                                         <TableCell>ID</TableCell>
+                                        <TableCell>Remove</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {row.bidders?.map((biddersRow) => (
-                                        <TableRow key={biddersRow.userId}>
+                                    {row.bidders && Object.keys(row.bidders).map((bidder) => (
+                                        <TableRow key={bidder.userId}>
                                             <TableCell component="th" scope="row">
-                                                {biddersRow.userName}
+                                                {row.bidders[bidder].userName}
                                             </TableCell>
-                                            <TableCell>{biddersRow.userId}</TableCell>
+                                            <TableCell>{row.bidders[bidder].userId}</TableCell>
+                                            <TableCell>
+                                                <Button variant="contained" color="error" onClick={() => removeBidderFromCompany(row.companyId, row.bidders[bidder].userId, row.companyName)}>Remove</Button>
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -120,6 +124,19 @@ export default function CompnayTable() {
         }
     }
 
+    const removeBidderFromCompany = async (companyId, userId, companyName) => {
+        try {
+            await updateDoc(doc(db, "companies", companyId), {
+                [`bidders.${userId}`]: deleteField()
+            })
+            await updateDoc(doc(db, 'users', userId), {
+                companies: arrayRemove(companyName)
+            })
+        } catch (error) {
+            console.error('Error deleting bidder from company:', error)
+        }
+    }
+
     if (loading) {
         return (<>
             Loading...
@@ -152,7 +169,7 @@ export default function CompnayTable() {
                         {rows.
                             filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().includes(search)).
                             map((row) => (
-                                <Row key={row.companyId} row={row} deleteCompany={deleteCompany} />
+                                <Row key={row.companyId} row={row} deleteCompany={deleteCompany} removeBidderFromCompany={removeBidderFromCompany} />
                             ))}
                     </TableBody>
                 </Table>

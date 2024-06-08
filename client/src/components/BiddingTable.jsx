@@ -53,7 +53,7 @@ function Row({ row, updateCompany, updateUser }) {
         <TableCell align="right">{row.totalVacancies}</TableCell>
         <TableCell align="right">{row.remainingVacancies}</TableCell>
         <TableCell align="right">{row.biddingPoints}</TableCell>
-        <TableCell align="right">  <Button variant="contained" color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row.companyName); }}>Bid</Button></TableCell>
+        <TableCell align="right">  <Button variant="contained" color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row); }}>Bid</Button></TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -70,12 +70,12 @@ function Row({ row, updateCompany, updateUser }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.bidders?.map((biddersRow) => (
-                    <TableRow key={biddersRow.userId}>
+                  {row.bidders && Object.keys(row.bidders).map((userId) => (
+                    <TableRow key={userId}>
                       <TableCell component="th" scope="row">
-                        {biddersRow.userName}
+                        {row.bidders[userId].userName}
                       </TableCell>
-                      <TableCell>{biddersRow.userId}</TableCell>
+                      <TableCell>{row.bidders[userId].userId}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
