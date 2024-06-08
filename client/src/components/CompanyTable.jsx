@@ -12,7 +12,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { arrayRemove, collection, deleteDoc, deleteField, doc, onSnapshot, query, updateDoc } from 'firebase/firestore';
+import { arrayRemove, collection, deleteDoc, deleteField, doc, increment, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Box, Stack, TextField, Typography, Button } from '@mui/material';
 import UpdateCompany from './UpdateCompany';
@@ -81,7 +81,7 @@ function Row({ row, deleteCompany, removeBidderFromCompany }) {
                                             </TableCell>
                                             <TableCell>{row.bidders[bidder].userId}</TableCell>
                                             <TableCell>
-                                                <Button variant="contained" color="error" onClick={() => removeBidderFromCompany(row.companyId, row.bidders[bidder].userId, row.companyName)}>Remove</Button>
+                                                <Button variant="contained" color="error" onClick={() => removeBidderFromCompany(row.companyId, row.bidders[bidder].userId, row.companyName,row.biddingMargin)}>Remove</Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -124,13 +124,14 @@ export default function CompnayTable() {
         }
     }
 
-    const removeBidderFromCompany = async (companyId, userId, companyName) => {
+    const removeBidderFromCompany = async (companyId, userId, companyName,biddingMargin) => {
         try {
             await updateDoc(doc(db, "companies", companyId), {
                 [`bidders.${userId}`]: deleteField()
             })
             await updateDoc(doc(db, 'users', userId), {
-                companies: arrayRemove(companyName)
+                companies: arrayRemove(companyName),
+                remainingBiddingPoints:increment(biddingMargin)
             })
         } catch (error) {
             console.error('Error deleting bidder from company:', error)

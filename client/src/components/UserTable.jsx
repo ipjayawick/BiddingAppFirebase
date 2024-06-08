@@ -52,7 +52,7 @@ function Row({ row, updateUser }) {
                 <TableCell align="right">{row.email}</TableCell>
                 <TableCell align="right">{row.initialBiddingPoints}</TableCell>
                 <TableCell align="right">{row.remainingBiddingPoints}</TableCell>
-                <TableCell align="right">  <UpdateUser userData={row}/></TableCell>
+                <TableCell align="right">  <UpdateUser userData={row} /></TableCell>
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -62,19 +62,19 @@ function Row({ row, updateUser }) {
                                 Companies
                             </Typography>
                             <Table size="small" aria-label="purchases">
-                                <TableHead>
+                                {/* <TableHead>
                                     <TableRow>
                                         <TableCell>Company</TableCell>
                                         <TableCell>ID</TableCell>
                                     </TableRow>
-                                </TableHead>
+                                </TableHead> */}
                                 <TableBody>
                                     {row.companies?.map((company, index) => (
                                         <TableRow key={index}>
                                             <TableCell component="th" scope="row">
                                                 {company}
                                             </TableCell>
-                                            <TableCell>{"companiesRow.companyId"}</TableCell>
+                                            {/* <TableCell>{"companiesRow.companyId"}</TableCell> */}
                                         </TableRow>
                                     ))}
                                 </TableBody>

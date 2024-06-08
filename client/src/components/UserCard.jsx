@@ -69,7 +69,7 @@ export default function OutlinedCard() {
                             </Typography>
                             <Stack spacing={1}>
                                 <List sx={{ pt: 0 }}>
-                                    {user.companies.map((company, index) => (
+                                    {user.companies?.map((company, index) => (
                                         <React.Fragment key={index}>
                                             <ListItem sx={{ py: 0, pt: 1 }}>
                                                 <ListItemText primary={company} />
