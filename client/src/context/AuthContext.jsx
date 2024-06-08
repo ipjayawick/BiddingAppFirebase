@@ -28,6 +28,7 @@ const AuthContextProvider = ({ children }) => {
             initialBiddingPoints: 100,
             remainingBiddingPoints: 100,
             createdAt: new Date(),
+            photoURL: firebaseUser.photoURL
           });
           setUser(userDoc.data());
         }

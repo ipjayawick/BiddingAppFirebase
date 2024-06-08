@@ -12,7 +12,7 @@ import BiddingTable from '../../components/BiddingTable'
 
 const BiddingPage = ({ companyId }) => {
   const [bidStatus, setBidStatus] = useState('');
-  const { user } = useContext(AuthContext)
+  const { user,googleSignOut } = useContext(AuthContext)
 
   const updateUser = async (companyData) => {
     const userRef = doc(db, "users", user.userId)
@@ -40,6 +40,7 @@ const BiddingPage = ({ companyId }) => {
           <BiddingTable updateCompany={updateCompany} updateUser={updateUser} />
         </Grid>
         <Grid item xs={12} sm={4}>
+          <Button variant="contained" onClick={()=>googleSignOut()}>Logout</Button>
           <UserCard />
         </Grid>
       </Grid>

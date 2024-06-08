@@ -42,15 +42,10 @@ export default function OutlinedCard() {
         <>
             <Card variant="outlined" sx={{ maxWidth: 360 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 0 }}>
-                    {userLoading || !user ? (<>Loading...</>) :
-                        (<>
-                            <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }} src={user.photoURL} />
-                            <Typography variant="h6" component="div">
-                                {user.displayName}
-                            </Typography>
-                        </>
-                        )
-                    }
+                    <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }} src={user.photoURL} />
+                    <Typography variant="h6" component="div">
+                        {user.displayName}
+                    </Typography>
                 </Box>
                 <Divider sx={{ mt: 2 }} />
                 <>
