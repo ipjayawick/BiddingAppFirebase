@@ -1,22 +1,11 @@
-import React, { useContext, useEffect } from 'react';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth, googleProvider } from "../../config/firebase";
+import React, { useContext } from 'react';
+import { getAuth } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import Button from '@mui/material/Button';
 import { AuthContext } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom'
-import { useLocation } from 'react-router-dom';
-
+import { Box, Typography, Container } from '@mui/material';
 const GoogleSignIn = () => {
   const { user, loading, googleSignIn, googleSignOut } = useContext(AuthContext)
-  const navigate = useNavigate()
-
-  // useEffect(() => {
-  //   if (user) {
-  //     console.log('user here')
-  //     navigate('/biddingPage')
-  //   }
-  // }, [])
 
   const functions = getFunctions();
   connectFunctionsEmulator(functions, "127.0.0.1", 5001);
@@ -43,32 +32,55 @@ const GoogleSignIn = () => {
       });
   }
 
-  const handleLogin = async () => {
-    try {
-      await googleSignIn()
-    } catch (error) {
-      console.log(error)
-    }
-  };
-
-  const handleLogOut = async () => {
-    try {
-      await googleSignOut()
-    } catch (error) {
-      console.log(error)
-    }
-    console.log(user)
-  };
-
 
   return (
     <>
-      <Button variant="contained" onClick={handleLogin}>Login with Google</Button>
+      <Box
+        sx={{
+          position: 'relative',
+          height: '100vh',
+          backgroundImage: `url(${"https://exmo.uom.lk/wp-content/uploads/2023/07/IMG_20220429_133352.jpg"})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <Container>
+          <Box
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              textAlign: 'center',
+              bgcolor: 'rgba(0, 0, 0, 0.5)',
+              p: 4,
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h2" component="h1" gutterBottom>
+              Bidding App
+            </Typography>
+            <Typography variant="h5" component="h2">
+              Login to continue
+            </Typography>
+          </Box>
+        </Container>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            zIndex: 0,
+          }}
+        />
+      </Box>
       <Button variant="contained" onClick={viewCurrentUser}>view user</Button>
       <Button variant="contained" onClick={sendAddMessage}>send message</Button>
       <Button variant="contained" onClick={showUser}>Show user</Button>
-      <Button variant="contained" onClick={handleLogOut}>Logout</Button>
-      <Button variant="contained" href='/biddingPage'>Go to bidding page</Button>
     </>
   );
 };

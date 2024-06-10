@@ -6,7 +6,8 @@ import BiddingPage from './pages/biddingPage/biddingPage.jsx'
 import AdminPage from './pages/adminPage/AdminPage.jsx'
 import { AuthContextProvider } from './context/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
-
+import AppBar from './components/AppBar.jsx'
+import { CssBaseline } from '@mui/material'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: '/biddingPage',
+    path: '/biddingPage', 
     element: (
       <ProtectedRoute>
         <BiddingPage />
@@ -38,6 +39,8 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AuthContextProvider>
+    <CssBaseline />
+      <AppBar />
       <RouterProvider router={router} />
     </AuthContextProvider>
   </React.StrictMode>,

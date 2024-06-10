@@ -1,18 +1,15 @@
-import React, { useRef, useState } from 'react'
-import Button from '@mui/material/Button';
+import React, { } from 'react'
 import { db } from '../../config/firebase';
-import { collection, addDoc, getDocs, updateDoc, doc, increment, arrayUnion } from "firebase/firestore";
+import { updateDoc, doc, increment, arrayUnion } from "firebase/firestore";
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Container, TextField, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import UserCard from '../../components/UserCard'
 import Grid from '@mui/material/Grid';
-import { Box } from '@mui/material';
 import BiddingTable from '../../components/BiddingTable'
 
-const BiddingPage = ({ companyId }) => {
-  const [bidStatus, setBidStatus] = useState('');
-  const { user,googleSignOut } = useContext(AuthContext)
+const BiddingPage = () => {
+  const { user } = useContext(AuthContext)
 
   const updateUser = async (companyData) => {
     const userRef = doc(db, "users", user.userId)
@@ -40,7 +37,6 @@ const BiddingPage = ({ companyId }) => {
           <BiddingTable updateCompany={updateCompany} updateUser={updateUser} />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <Button variant="contained" onClick={()=>googleSignOut()}>Logout</Button>
           <UserCard />
         </Grid>
       </Grid>

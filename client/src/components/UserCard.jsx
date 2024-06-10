@@ -1,16 +1,10 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import Avatar from '@mui/material/Avatar';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { collection, onSnapshot, query, doc } from 'firebase/firestore';
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { db } from '../config/firebase';
-import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { List, ListItem, ListItemText } from '@mui/material';

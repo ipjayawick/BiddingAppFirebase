@@ -17,8 +17,9 @@ import { db } from '../config/firebase';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { getDocs, collection, query, onSnapshot } from 'firebase/firestore';
-import { Button, Stack, TextField } from '@mui/material';
+import { Button, Checkbox, Radio, Stack, TextField } from '@mui/material';
 
+import Switch from '../components/Switch'
 function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingPoints, bidders) {
   return {
     companyId,
@@ -31,12 +32,23 @@ function createData(companyId, companyName, description, totalVacancies, remaini
   };
 }
 
-function Row({ row, updateCompany, updateUser }) {
-  const [open, setOpen] = React.useState(false);
+function Row({ row, updateCompany, updateUser, setActiveRowId, enabled }) {
+  const [open, setOpen] = useState(false);
+
+  const handleChange = () => {
+    if (enabled) {
+      setActiveRowId(null)
+    } else {
+      setActiveRowId(row.companyId)
+    }
+  };
 
   return (
     <React.Fragment>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+      <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: enabled ? "lightgreen" : "null" }}>
+        <TableCell>
+          <Switch handleChange={handleChange} enabled={enabled} />
+        </TableCell>
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -91,6 +103,7 @@ function Row({ row, updateCompany, updateUser }) {
 export default function BiddingTable({ updateCompany, updateUser }) {
   const [rows, setRows] = useState([])
   const [search, setSearch] = useState('')
+  const [activeRowId, setActiveRowId] = useState('')
 
   const [loading, setLoading] = useState(true)
   useEffect(() => {
@@ -133,7 +146,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
               {rows.
                 filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().includes(search)).
                 map((row) => (
-                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} />
+                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} setActiveRowId={setActiveRowId} enabled={activeRowId === row.companyId} />
                 ))}
             </TableBody>
           </Table>

@@ -7,16 +7,20 @@ const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (window.location.pathname === '/') {
+      if (user && !loading) {
+        navigate('/biddingPage')
+      } else {
+        return
+      }
+    }
     if (!loading && !user) {
       console.log("redirecting")
       navigate('/', { replace: true });
     }
-    if (window.location.pathname === '/' && user && !loading) {
-      navigate('/biddingPage')
-    }
   }, [navigate, user, loading]);
 
-  if (loading) {
+  if (loading && !window.location.pathname === '/') {
     return <div>Loading...</div>;
   }
 
