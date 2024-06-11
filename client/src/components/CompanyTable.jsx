@@ -74,8 +74,8 @@ function Row({ row, deleteCompany, removeBidderFromCompany }) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {row.bidders && Object.keys(row.bidders).map((bidder) => (
-                                        <TableRow key={bidder.userId}>
+                                    {row.bidders && Object.keys(row.bidders).map((bidder,index) => (
+                                        <TableRow key={index}>
                                             <TableCell component="th" scope="row">
                                                 {row.bidders[bidder].userName}
                                             </TableCell>
