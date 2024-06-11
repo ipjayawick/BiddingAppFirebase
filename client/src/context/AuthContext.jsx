@@ -21,7 +21,7 @@ const AuthContextProvider = ({ children }) => {
           // setUser({ ...firebaseUser, ...userDoc.data() });
           setUser(userDoc.data());
         } else {
-          await setDoc(doc(db, 'users', firebaseUser.uid), {
+          const userData = {
             userId: firebaseUser.uid,
             displayName: firebaseUser.displayName,
             email: firebaseUser.email,
@@ -29,8 +29,9 @@ const AuthContextProvider = ({ children }) => {
             remainingBiddingPoints: 100,
             createdAt: new Date(),
             photoURL: firebaseUser.photoURL
-          });
-          setUser(userDoc.data());
+          }
+          await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+          setUser(userData);
         }
       } else {
         setUser(null);
@@ -41,7 +42,6 @@ const AuthContextProvider = ({ children }) => {
   }, []);
 
   const googleSignIn = async () => {
-    setLoading(true);
     const auth = getAuth();
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -56,7 +56,6 @@ const AuthContextProvider = ({ children }) => {
       const credential = GoogleAuthProvider.credentialFromError(error);
       console.error('Error:', errorCode, errorMessage, email, credential);
     }
-    setLoading(false);
   }
 
   const googleSignOut = async () => {
