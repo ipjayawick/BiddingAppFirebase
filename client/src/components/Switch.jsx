@@ -18,6 +18,7 @@ const IOSSwitch = styled((props) => (
     '& .MuiSwitch-switchBase': {
         padding: 0,
         margin: 2,
+        
         transitionDuration: '300ms',
         '&.Mui-checked': {
             transform: 'translateX(16px)',
@@ -63,9 +64,9 @@ const IOSSwitch = styled((props) => (
 export default function CustomizedSwitches({ handleChange,enabled }) {
     return (
         <FormGroup>
-            <FormControlLabel
-                control={<IOSSwitch sx={{ m: 1 }} onChange={handleChange} checked={enabled} />}
-                label="Enable"
+            <FormControlLabel sx={{mr:0}}   
+                control={<IOSSwitch sx={{ m: 1,mr:0,pr:0 }} onChange={handleChange} checked={enabled} />}
+                // label="Enable"
             />
         </FormGroup>
     );

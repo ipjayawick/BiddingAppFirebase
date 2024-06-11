@@ -45,10 +45,10 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled }) {
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: enabled ? "lightgreen" : "null" }}>
-        <TableCell>
+        <TableCell  sx={{pr:0}}>
           <Switch handleChange={handleChange} enabled={enabled} />
         </TableCell>
-        <TableCell>
+        <TableCell sx={{pr:0.5}}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -57,7 +57,7 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled }) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
+        <TableCell component="th" scope="row" sx={{pl:0}}>
           {row.companyName}
         </TableCell>
         <TableCell align="right">{row.description}</TableCell>
@@ -105,7 +105,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
   const [activeRowId, setActiveRowId] = useState('')
 
   const [loading, setLoading] = useState(true)
-  
+
   useEffect(() => {
     const q = query(collection(db, "companies"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -150,6 +150,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
           <Table aria-label="collapsible table">
             <TableHead>
               <TableRow>
+                <TableCell />
                 <TableCell />
                 <TableCell>Company</TableCell>
                 <TableCell align="right">Description</TableCell>
