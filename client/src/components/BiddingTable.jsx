@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -16,8 +15,8 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { db } from '../config/firebase';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { getDocs, collection, query, onSnapshot } from 'firebase/firestore';
-import { Button, Checkbox, Radio, Stack, TextField } from '@mui/material';
+import { collection, query, onSnapshot, updateDoc, doc, setDoc } from 'firebase/firestore';
+import { Button, Stack, TextField } from '@mui/material';
 
 import Switch from '../components/Switch'
 function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingPoints, bidders) {
@@ -32,14 +31,14 @@ function createData(companyId, companyName, description, totalVacancies, remaini
   };
 }
 
-function Row({ row, updateCompany, updateUser, setActiveRowId, enabled }) {
+function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled }) {
   const [open, setOpen] = useState(false);
 
   const handleChange = () => {
     if (enabled) {
-      setActiveRowId(null)
+      updateActiveRowId(null)
     } else {
-      setActiveRowId(row.companyId)
+      updateActiveRowId(row.companyId)
     }
   };
 
@@ -106,6 +105,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
   const [activeRowId, setActiveRowId] = useState('')
 
   const [loading, setLoading] = useState(true)
+  
   useEffect(() => {
     const q = query(collection(db, "companies"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -118,9 +118,26 @@ export default function BiddingTable({ updateCompany, updateUser }) {
       setRows(updatedCompanies);
       setLoading(false)
     });
-
-    return () => unsubscribe(); // Clean up the listener on unmount
+    return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, "controlData", "activeCompany"), (doc) => {
+      const activeRowId = doc.data().activeCompanyId
+      setActiveRowId(activeRowId)
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const updateActiveRowId = async (companyId) => {
+    try {
+      await setDoc(doc(db, "controlData", "activeCompany"), {
+        activeCompanyId: companyId
+      });
+    } catch (error) {
+      console.error('Error updating control data:', error);
+    }
+  }
 
   if (!loading) {
     return (
@@ -146,7 +163,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
               {rows.
                 filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().includes(search)).
                 map((row) => (
-                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} setActiveRowId={setActiveRowId} enabled={activeRowId === row.companyId} />
+                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} updateActiveRowId={updateActiveRowId} enabled={activeRowId === row.companyId} />
                 ))}
             </TableBody>
           </Table>
