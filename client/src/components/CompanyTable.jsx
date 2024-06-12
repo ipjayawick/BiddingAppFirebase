@@ -168,7 +168,7 @@ export default function CompnayTable() {
                     </TableHead>
                     <TableBody>
                         {rows.
-                            filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().includes(search)).
+                            filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().startsWith(search)).
                             map((row) => (
                                 <Row key={row.companyId} row={row} deleteCompany={deleteCompany} removeBidderFromCompany={removeBidderFromCompany} />
                             ))}

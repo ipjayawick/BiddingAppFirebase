@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     if (window.location.pathname === '/') {
-      console.log(user,loading)
+      console.log(user, loading)
       if (user && !loading) {
         navigate('/biddingPage')
       } else {
@@ -19,6 +19,11 @@ const ProtectedRoute = ({ children }) => {
       console.log("redirecting")
       navigate('/', { replace: true });
     }
+
+    if (!loading && !user?.isAdmin && window.location.pathname === '/adminPage') {
+      navigate('/biddingPage')
+    }
+
   }, [navigate, user, loading]);
 
   if (loading && !window.location.pathname === '/') {

@@ -47,9 +47,11 @@ function ResponsiveAppBar({ loginOnClick }) {
                         <Button sx={{ color: '#fff' }} href='/biddingPage'>
                             Dashboard
                         </Button>
-                        <Button sx={{ color: '#fff' }} href='/adminPage'>
-                            Admin
-                        </Button>
+                        {user?.isAdmin && (
+                            <Button sx={{ color: '#fff' }} href='/adminPage'>
+                                Admin
+                            </Button>
+                        )}
                         <Button sx={{ color: '#fff' }} >
                             About
                         </Button>

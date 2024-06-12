@@ -10,7 +10,6 @@ const AuthContext = createContext(null);
 const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -28,7 +27,8 @@ const AuthContextProvider = ({ children }) => {
             initialBiddingPoints: 100,
             remainingBiddingPoints: 100,
             createdAt: new Date(),
-            photoURL: firebaseUser.photoURL
+            photoURL: firebaseUser.photoURL,
+            isAdmin: false
           }
           await setDoc(doc(db, 'users', firebaseUser.uid), userData);
           setUser(userData);

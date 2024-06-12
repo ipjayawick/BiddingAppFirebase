@@ -129,7 +129,7 @@ export default function UserTable({ updateUser }) {
                         </TableHead>
                         <TableBody>
                             {rows.
-                                filter((row) => search.toLowerCase() === '' ? true : row.userName.toLowerCase().includes(search)).
+                                filter((row) => search.toLowerCase() === '' ? true : row.userName.toLowerCase().startsWith(search)).
                                 map((row) => (
                                     <Row key={row.userId} row={row} updateUser={updateUser} />
                                 ))}

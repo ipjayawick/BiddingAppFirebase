@@ -19,6 +19,8 @@ import { collection, query, onSnapshot, updateDoc, doc, setDoc } from 'firebase/
 import { Button, Stack, TextField } from '@mui/material';
 
 import Switch from '../components/Switch'
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingPoints, bidders) {
   return {
     companyId,
@@ -31,7 +33,7 @@ function createData(companyId, companyName, description, totalVacancies, remaini
   };
 }
 
-function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled }) {
+function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdmin }) {
   const [open, setOpen] = useState(false);
 
   const handleChange = () => {
@@ -45,10 +47,12 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled }) {
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: enabled ? "lightgreen" : "null" }}>
-        <TableCell  sx={{pr:0}}>
-          <Switch handleChange={handleChange} enabled={enabled} />
-        </TableCell>
-        <TableCell sx={{pr:0.5}}>
+        {isAdmin && (
+          <TableCell sx={{ pr: 0 }}>
+            <Switch handleChange={handleChange} enabled={enabled} />
+          </TableCell>
+        )}
+        <TableCell sx={{ pr: 0.5 }}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -57,7 +61,7 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled }) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row" sx={{pl:0}}>
+        <TableCell component="th" scope="row" sx={{ pl: 0 }}>
           {row.companyName}
         </TableCell>
         <TableCell align="right">{row.description}</TableCell>
@@ -103,8 +107,8 @@ export default function BiddingTable({ updateCompany, updateUser }) {
   const [rows, setRows] = useState([])
   const [search, setSearch] = useState('')
   const [activeRowId, setActiveRowId] = useState('')
-
   const [loading, setLoading] = useState(true)
+  const { user: authUser } = useContext(AuthContext)
 
   useEffect(() => {
     const q = query(collection(db, "companies"));
@@ -150,7 +154,9 @@ export default function BiddingTable({ updateCompany, updateUser }) {
           <Table aria-label="collapsible table">
             <TableHead>
               <TableRow>
-                <TableCell />
+                {authUser.isAdmin && (
+                  <TableCell />
+                )}
                 <TableCell />
                 <TableCell>Company</TableCell>
                 <TableCell align="right">Description</TableCell>
@@ -162,9 +168,9 @@ export default function BiddingTable({ updateCompany, updateUser }) {
             </TableHead>
             <TableBody>
               {rows.
-                filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().includes(search)).
+                filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().startsWith(search)).
                 map((row) => (
-                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} updateActiveRowId={updateActiveRowId} enabled={activeRowId === row.companyId} />
+                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} updateActiveRowId={updateActiveRowId} enabled={activeRowId === row.companyId} isAdmin={authUser.isAdmin} />
                 ))}
             </TableBody>
           </Table>
