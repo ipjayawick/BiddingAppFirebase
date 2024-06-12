@@ -48,54 +48,58 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdm
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: enabled ? "lightgreen" : "null" }}>
         {isAdmin && (
-          <TableCell sx={{ pr: 0 }}>
-            <Switch handleChange={handleChange} enabled={enabled} />
-          </TableCell>
+          <>
+            <TableCell sx={{ pr: 0 }}>
+              <Switch handleChange={handleChange} enabled={enabled} />
+            </TableCell>
+            <TableCell sx={{ pr: 0.5 }}>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </TableCell>
+          </>
         )}
-        <TableCell sx={{ pr: 0.5 }}>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell component="th" scope="row" sx={{ pl: 0 }}>
+        <TableCell component="th" scope="row">
           {row.companyName}
         </TableCell>
         <TableCell align="right">{row.description}</TableCell>
         <TableCell align="right">{row.totalVacancies}</TableCell>
         <TableCell align="right">{row.remainingVacancies}</TableCell>
         <TableCell align="right">{row.biddingPoints}</TableCell>
-        <TableCell align="right">  <Button variant="contained" color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row); }}>Bid</Button></TableCell>
+        <TableCell align="right">  <Button variant="contained" disabled={!enabled || isAdmin} color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row); }}>Bid</Button></TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Bidders
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>User</TableCell>
-                    <TableCell>ID</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.bidders && Object.keys(row.bidders).map((userId) => (
-                    <TableRow key={userId}>
-                      <TableCell component="th" scope="row">
-                        {row.bidders[userId].userName}
-                      </TableCell>
-                      <TableCell>{row.bidders[userId].userId}</TableCell>
+            {isAdmin && (
+              <Box sx={{ margin: 1 }}>
+                <Typography variant="h6" gutterBottom component="div">
+                  Bidders
+                </Typography>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>User</TableCell>
+                      <TableCell>ID</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
+                  </TableHead>
+                  <TableBody>
+                    {row.bidders && Object.keys(row.bidders).map((userId) => (
+                      <TableRow key={userId}>
+                        <TableCell component="th" scope="row">
+                          {row.bidders[userId].userName}
+                        </TableCell>
+                        <TableCell>{row.bidders[userId].userId}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            )}
           </Collapse>
         </TableCell>
       </TableRow>
@@ -155,9 +159,11 @@ export default function BiddingTable({ updateCompany, updateUser }) {
             <TableHead>
               <TableRow>
                 {authUser.isAdmin && (
-                  <TableCell />
+                  <>
+                    <TableCell />
+                    <TableCell />
+                  </>
                 )}
-                <TableCell />
                 <TableCell>Company</TableCell>
                 <TableCell align="right">Description</TableCell>
                 <TableCell align="right">Total Vacancies</TableCell>
