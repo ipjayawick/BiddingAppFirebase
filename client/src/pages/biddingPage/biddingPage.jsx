@@ -1,4 +1,4 @@
-import React, { } from 'react'
+import React, { useState } from 'react'
 import { db } from '../../config/firebase';
 import { updateDoc, doc, increment, arrayUnion } from "firebase/firestore";
 import { useContext } from 'react';
@@ -7,6 +7,7 @@ import { Container } from '@mui/material';
 import UserCard from '../../components/UserCard'
 import Grid from '@mui/material/Grid';
 import BiddingTable from '../../components/BiddingTable'
+import BiddingInfoCard from '../../components/BiddingInfoCard'
 
 const BiddingPage = () => {
   const { user } = useContext(AuthContext)
@@ -34,10 +35,14 @@ const BiddingPage = () => {
     <Container sx={{ mt: 10 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={8}>
-          <BiddingTable updateCompany={updateCompany} updateUser={updateUser} />
+          <BiddingTable updateCompany={updateCompany} updateUser={updateUser}/>
         </Grid>
         <Grid item xs={12} sm={4}>
-          <UserCard />
+          {user?.isAdmin ? (
+            <BiddingInfoCard />
+          ) : (
+            <UserCard />
+          )}
         </Grid>
       </Grid>
     </Container>

@@ -33,7 +33,7 @@ function createData(companyId, companyName, description, totalVacancies, remaini
   };
 }
 
-function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdmin }) {
+function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdmin,isBiddingActive }) {
   const [open, setOpen] = useState(false);
 
   const handleChange = () => {
@@ -70,7 +70,7 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdm
         <TableCell align="right">{row.totalVacancies}</TableCell>
         <TableCell align="right">{row.remainingVacancies}</TableCell>
         <TableCell align="right">{row.biddingPoints}</TableCell>
-        <TableCell align="right">  <Button variant="contained" disabled={!enabled || isAdmin} color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row); }}>Bid</Button></TableCell>
+        <TableCell align="right">  <Button variant="contained" disabled={!enabled || isAdmin || !isBiddingActive} color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row); }}>Bid</Button></TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -112,6 +112,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
   const [search, setSearch] = useState('')
   const [activeRowId, setActiveRowId] = useState('')
   const [loading, setLoading] = useState(true)
+  const [isBiddingActive, setIsBiddingActive] = useState(false)
   const { user: authUser } = useContext(AuthContext)
 
   useEffect(() => {
@@ -132,15 +133,22 @@ export default function BiddingTable({ updateCompany, updateUser }) {
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, "controlData", "activeCompany"), (doc) => {
       const activeRowId = doc.data().activeCompanyId
+      setIsBiddingActive(doc.data().isBiddingActive)
       setActiveRowId(activeRowId)
+
     });
     return () => unsubscribe();
   }, []);
 
   const updateActiveRowId = async (companyId) => {
     try {
+      let companyRef = null
+      if (companyId) {
+        companyRef = doc(db, 'companies', companyId)
+      }
       await setDoc(doc(db, "controlData", "activeCompany"), {
-        activeCompanyId: companyId
+        activeCompanyId: companyId,
+        companyRef
       });
     } catch (error) {
       console.error('Error updating control data:', error);
@@ -176,7 +184,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
               {rows.
                 filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().startsWith(search)).
                 map((row) => (
-                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} updateActiveRowId={updateActiveRowId} enabled={activeRowId === row.companyId} isAdmin={authUser.isAdmin} />
+                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} updateActiveRowId={updateActiveRowId} enabled={activeRowId === row.companyId} isAdmin={authUser.isAdmin} isBiddingActive={isBiddingActive} />
                 ))}
             </TableBody>
           </Table>
