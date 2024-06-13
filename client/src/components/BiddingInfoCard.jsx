@@ -23,21 +23,20 @@ export default function OutlinedCard() {
             if (companyRef) {
                 const data = await getDoc(companyRef)
                 setActiveCompany(data.data())
-                setIsBiddingActive(data.data().isBiddingActive)
             } else {
                 setActiveCompany(null)
             }
+            setIsBiddingActive(doc.data().isBiddingActive)
         });
         return () => unsubscribe();
     }, []);
 
-    const setBiddingStatus = async (biddingStatus) => {
-        console.log(biddingStatus, "--")
+    const updateteBiddingStatus = async (isBiddingActive) => {
         await updateDoc(doc(db, "controlData", "activeCompany"), {
-            isBiddingActive: biddingStatus
+            isBiddingActive
         })
-        setIsBiddingActive(biddingStatus)
     };
+
     if (activeCompany === null) {
         return (
             <>
@@ -45,6 +44,7 @@ export default function OutlinedCard() {
             </>
         )
     }
+
     return (
         <>
             <Card variant="outlined" sx={{ maxWidth: 360 }}>
@@ -57,7 +57,7 @@ export default function OutlinedCard() {
                         <Button
                             variant="contained"
                             color={isBiddingActive ? "error" : "success"}
-                            onClick={() => setBiddingStatus(!isBiddingActive)}
+                            onClick={() => updateteBiddingStatus(!isBiddingActive)}
                         >
                             {isBiddingActive ? "Stop" : "Start"}
                         </Button>

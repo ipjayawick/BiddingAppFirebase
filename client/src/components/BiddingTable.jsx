@@ -33,7 +33,7 @@ function createData(companyId, companyName, description, totalVacancies, remaini
   };
 }
 
-function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdmin,isBiddingActive }) {
+function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdmin, isBiddingActive }) {
   const [open, setOpen] = useState(false);
 
   const handleChange = () => {
@@ -148,7 +148,8 @@ export default function BiddingTable({ updateCompany, updateUser }) {
       }
       await setDoc(doc(db, "controlData", "activeCompany"), {
         activeCompanyId: companyId,
-        companyRef
+        companyRef,
+        isBiddingActive: false
       });
     } catch (error) {
       console.error('Error updating control data:', error);
