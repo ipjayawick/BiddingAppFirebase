@@ -12,6 +12,7 @@ import { arrayRemove, deleteField, doc, getDoc, increment, onSnapshot, setDoc, u
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { db } from '../config/firebase';
+import UpdateBiddingMarginDialog from '../components/UpdateBiddingMarginDialog'
 
 export default function OutlinedCard() {
     const [activeCompany, setActiveCompany] = useState(null)
@@ -55,6 +56,28 @@ export default function OutlinedCard() {
         }
     }
 
+    const changeBiddingMargin = async (value) => {
+        console.log(Object.keys(activeCompany?.bidders).length)
+        await updateDoc(doc(db, 'companies', activeCompanyId), {
+            biddingMargin: value,
+            bidders:{},
+            remainingVacancies: increment(Object.keys(activeCompany?.bidders).length)
+        })
+        setUpdateCount(prev => prev + 1);
+    }
+
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+
+
     if (activeCompany === null) {
         return (
             <>
@@ -66,6 +89,7 @@ export default function OutlinedCard() {
 
     return (
         <>
+            <UpdateBiddingMarginDialog handleClose={handleClose} open={open} currentMargin={activeCompany.biddingMargin} changeBiddingMargin={changeBiddingMargin} />
             <Typography variant="h4" mb={2.5}>Active Company</Typography>
             <Card variant="outlined" sx={{ maxWidth: 360 }}>
                 <Box sx={{ p: 2, pb: 0 }}>
@@ -90,19 +114,18 @@ export default function OutlinedCard() {
                             <Typography gutterBottom fontSize={18} component="div" mb={0}>
                                 Bidding Margin
                             </Typography>
-                            <Button variant="contained" color="primary" sx={{ marginLeft: "auto", marginRight: 2 }}>Change</Button>
+                            <Button variant="contained" color="primary" sx={{ marginLeft: "auto", marginRight: 2 }} onClick={handleClickOpen}>Change</Button>
                             <Typography gutterBottom fontSize={18} component="div" mb={0}>
                                 {activeCompany?.biddingMargin}
                             </Typography>
                         </Stack>
                     </Box>
                     <Divider />
-                    <Box sx={{ p: 2, backgroundColor: (activeCompany.totalVacancies < Object.keys(activeCompany.bidders).length) && "#FF6865" }}>
+                    <Box sx={{ p: 2, backgroundColor: (activeCompany.bidders && (activeCompany.totalVacancies < Object.keys(activeCompany.bidders).length)) && "#FF6865" }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Typography gutterBottom fontSize={18} component="div" mb={0} >
-                                Vacancies for Round
+                                Vacancies Available
                             </Typography>
-                            <Button variant="contained" color="primary" sx={{ marginLeft: "auto", marginRight: 2 }}>Change</Button>
                             <Typography gutterBottom fontSize={18} component="div" mb={0}>
                                 {activeCompany?.totalVacancies}
                             </Typography>
