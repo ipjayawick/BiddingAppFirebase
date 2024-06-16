@@ -33,7 +33,7 @@ function createData(companyId, companyName, description, totalVacancies, remaini
   };
 }
 
-function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdmin, isBiddingActive }) {
+function Row({ row,updateActiveRowId, enabled, isAdmin, isBiddingActive, addActiveCompanyBidders }) {
   const [open, setOpen] = useState(false);
 
   const handleChange = () => {
@@ -70,7 +70,7 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdm
         <TableCell align="right">{row.totalVacancies}</TableCell>
         <TableCell align="right">{row.remainingVacancies}</TableCell>
         <TableCell align="right">{row.biddingPoints}</TableCell>
-        <TableCell align="right">  <Button variant="contained" disabled={!enabled || isAdmin || !isBiddingActive} color="primary" onClick={() => { updateCompany(row.companyId); updateUser(row); }}>Bid</Button></TableCell>
+        <TableCell align="right">  <Button variant="contained" disabled={!enabled || isAdmin || !isBiddingActive} color="primary" onClick={() => {addActiveCompanyBidders() }}>Bid</Button></TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -107,7 +107,7 @@ function Row({ row, updateCompany, updateUser, updateActiveRowId, enabled, isAdm
   );
 }
 
-export default function BiddingTable({ updateCompany, updateUser }) {
+export default function BiddingTable({addActiveCompanyBidders }) {
   const [rows, setRows] = useState([])
   const [search, setSearch] = useState('')
   const [activeRowId, setActiveRowId] = useState('')
@@ -185,7 +185,7 @@ export default function BiddingTable({ updateCompany, updateUser }) {
               {rows.
                 filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().startsWith(search)).
                 map((row) => (
-                  <Row key={row.companyId} row={row} updateCompany={updateCompany} updateUser={updateUser} updateActiveRowId={updateActiveRowId} enabled={activeRowId === row.companyId} isAdmin={authUser.isAdmin} isBiddingActive={isBiddingActive} />
+                  <Row key={row.companyId} row={row} updateActiveRowId={updateActiveRowId} enabled={activeRowId === row.companyId} isAdmin={authUser.isAdmin} isBiddingActive={isBiddingActive} addActiveCompanyBidders={addActiveCompanyBidders} />
                 ))}
             </TableBody>
           </Table>

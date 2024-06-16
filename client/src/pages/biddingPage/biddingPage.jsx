@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { db } from '../../config/firebase';
-import { updateDoc, doc, increment, arrayUnion } from "firebase/firestore";
+import { updateDoc, doc, increment, arrayUnion, setDoc } from "firebase/firestore";
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Container } from '@mui/material';
@@ -12,22 +12,15 @@ import BiddingInfoCard from '../../components/BiddingInfoCard'
 const BiddingPage = () => {
   const { user } = useContext(AuthContext)
 
-  const updateUser = async (companyData) => {
-    const userRef = doc(db, "users", user.userId)
-    await updateDoc(userRef, {
-      remainingBiddingPoints: increment(-companyData.biddingPoints),
-      companies: arrayUnion(companyData.companyName)
-    })
-  }
 
-  const updateCompany = async (companyId) => {
-    const companyRef = doc(db, "companies", companyId)
-    await updateDoc(companyRef, {
-      [`bidders.${user.userId}`]: {
-        userId: user.userId,
-        userName: user.displayName
-      },
-      remainingVacancies: increment(-1),
+  const addActiveCompanyBidders = async () => {
+    const bidderObj = {
+      userId: user.userId,
+      userName: user.displayName,
+      userRef: doc(db, "users", user.userId)
+    }
+    await updateDoc(doc(db, "controlData", "activeCompany"), {
+      [`bidders.${user.userId}`]: bidderObj
     })
   }
 
@@ -35,7 +28,7 @@ const BiddingPage = () => {
     <Container sx={{ mt: 10 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={8}>
-          <BiddingTable updateCompany={updateCompany} updateUser={updateUser}/>
+          <BiddingTable addActiveCompanyBidders={addActiveCompanyBidders} />
         </Grid>
         <Grid item xs={12} sm={4}>
           {user?.isAdmin ? (

@@ -26,7 +26,7 @@ export default function FormDialog({ open, handleClose, currentMargin, changeBid
                     component: 'form',
                     onSubmit: (event) => {
                         event.preventDefault();
-                        changeBiddingMargin(marginValue)
+                        changeBiddingMargin(+marginValue)
                         handleClose();
                     },
                 }}
