@@ -19,24 +19,16 @@ export default function UpdateUser({ userData }) {
         }
     }, [userData]);
 
-    const updateCompany = async (remainingBiddingPoints, initialBiddingPoints) => {
+    const handleSubmit = async (event) => {
+        event.preventDefault();
         try {
             await updateDoc(doc(db, "users", userData.userId), {
-                remainingBiddingPoints,
-                initialBiddingPoints
+                remainingBiddingPoints: +remainingBiddingPoints,
+                initialBiddingPoints: +initialBiddingPoints
             });
         } catch (error) {
             console.error('Error updating user:', error);
         }
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        await updateCompany(+remainingBiddingPoints, +initialBiddingPoints)
-        setUserName('');
-        setEmail('');
-        setInitialBiddingPoints('');
-        setRemainingBiddingPoints('');
         setOpen(false)
     };
 
@@ -57,62 +49,67 @@ export default function UpdateUser({ userData }) {
     return (
         <>
             <Button variant="contained" color="primary" onClick={handleClickOpen}>Update</Button>
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: (event) => {
+                        handleSubmit(event)
+                    },
+                }}>
                 <DialogTitle>Edit User</DialogTitle>
                 <DialogContent>
-                    <form>
-                        <TextField
-                            label="User Name"
-                            fullWidth
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="filled"
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                        />
-                        <TextField
-                            label="Email"
-                            fullWidth
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="filled"
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                        />
-                        <TextField
-                            label="Initial Bidding Points"
-                            fullWidth
-                            type="number"
-                            value={initialBiddingPoints}
-                            onChange={(e) => setInitialBiddingPoints(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="standard"
-                        />
-                        <TextField
-                            label="Remaining Bidding Points"
-                            fullWidth
-                            type="number"
-                            value={remainingBiddingPoints}
-                            onChange={(e) => setRemainingBiddingPoints(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="standard"
-                        />
-
-                    </form>
+                    <TextField
+                        label="User Name"
+                        fullWidth
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="filled"
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                    <TextField
+                        label="Email"
+                        fullWidth
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="filled"
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                    <TextField
+                        label="Initial Bidding Points"
+                        fullWidth
+                        type="number"
+                        value={initialBiddingPoints}
+                        onChange={(e) => setInitialBiddingPoints(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="standard"
+                    />
+                    <TextField
+                        label="Remaining Bidding Points"
+                        fullWidth
+                        type="number"
+                        value={remainingBiddingPoints}
+                        onChange={(e) => setRemainingBiddingPoints(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="standard"
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit} color="primary">
+                    <Button type="submit" color="primary">
                         Update
                     </Button>
                 </DialogActions>

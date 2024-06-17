@@ -22,26 +22,20 @@ export default function UpdateCompany({ companyData }) {
         }
     }, [companyData]);
 
-    const updateCompany = async (description, totalVacancies, remainingVacancies, biddingMargin) => {
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
         try {
             await updateDoc(doc(db, "companies", companyData.companyId), {
                 description,
-                totalVacancies,
-                remainingVacancies,
-                biddingMargin
+                totalVacancies: +totalVacancies,
+                remainingVacancies: +remainingVacancies,
+                biddingMargin: +biddingMargin
             });
         } catch (error) {
             console.error('Error adding company to Firestore:', error);
         }
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        await updateCompany(description, +totalVacancies, +remainingVacancies, +biddingMargin)
-        setCompanyName('');
-        setDescription('');
-        setBiddingMargin('');
-        setTotalVacancies('');
         setOpen(false)
     };
 
@@ -63,68 +57,74 @@ export default function UpdateCompany({ companyData }) {
     return (
         <>
             <Button variant="contained" color="primary" onClick={handleClickOpen}>Update</Button>
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: (event) => {
+                        handleSubmit(event);
+                    },
+                }}>
                 <DialogTitle>Edit Company</DialogTitle>
                 <DialogContent>
-                    <form>
-                        <TextField
-                            label="Company Name"
-                            fullWidth
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="filled"
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                        />
-                        <TextField
-                            label="Description"
-                            fullWidth
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="standard"
-                        />
-                        <TextField
-                            label="Total Vacancies"
-                            fullWidth
-                            type="number"
-                            value={totalVacancies}
-                            onChange={(e) => setTotalVacancies(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="standard"
-                        />
-                        <TextField
-                            label="Remaining Vacancies"
-                            fullWidth
-                            type="number"
-                            value={remainingVacancies}
-                            onChange={(e) => setRemainingVacancies(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="standard"
-                        />
-                        <TextField
-                            label="Bidding Margin"
-                            fullWidth
-                            type="number"
-                            value={biddingMargin}
-                            onChange={(e) => setBiddingMargin(e.target.value)}
-                            margin="normal"
-                            required
-                            variant="standard"
-                        />
-                    </form>
+                    <TextField
+                        label="Company Name"
+                        fullWidth
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="filled"
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                    <TextField
+                        label="Description"
+                        fullWidth
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="standard"
+                    />
+                    <TextField
+                        label="Total Vacancies"
+                        fullWidth
+                        type="number"
+                        value={totalVacancies}
+                        onChange={(e) => setTotalVacancies(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="standard"
+                    />
+                    <TextField
+                        label="Remaining Vacancies"
+                        fullWidth
+                        type="number"
+                        value={remainingVacancies}
+                        onChange={(e) => setRemainingVacancies(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="standard"
+                    />
+                    <TextField
+                        label="Bidding Margin"
+                        fullWidth
+                        type="number"
+                        value={biddingMargin}
+                        onChange={(e) => setBiddingMargin(e.target.value)}
+                        margin="normal"
+                        required
+                        variant="standard"
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit} color="primary">
+                    <Button type="submit" color="primary">
                         Update
                     </Button>
                 </DialogActions>
