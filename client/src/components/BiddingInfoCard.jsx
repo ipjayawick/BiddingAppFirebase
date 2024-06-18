@@ -14,19 +14,18 @@ import { useEffect } from 'react';
 import { db } from '../config/firebase';
 import UpdateBiddingMarginDialog from '../components/UpdateBiddingMarginDialog'
 
-export default function OutlinedCard() {
+export default function OutlinedCard({ activeCompanyData }) {
     const [activeCompany, setActiveCompany] = useState(null)
-    const [isBiddingActive, setIsBiddingActive] = useState(false);
-    const [activeCompanyId, setActiveCompanyId] = useState(null)
-    const [bidders, setBidders] = useState({})
+    const [isBiddingActive, setIsBiddingActive] = useState(activeCompanyData.isBiddingActive);
+    const [activeCompanyId, setActiveCompanyId] = useState(activeCompanyData.activeCompanyId)
+    const [bidders, setBidders] = useState(activeCompanyData.bidders)
+
     useEffect(() => {
-        const unsubscribe = onSnapshot(doc(db, "controlData", "activeCompany"), async (doc) => {
-            setActiveCompanyId(doc.data().activeCompanyId)
-            setIsBiddingActive(doc.data().isBiddingActive)
-            setBidders(doc.data().bidders)
-        });
-        return () => unsubscribe();
-    }, []);
+        console.log(activeCompanyData)
+        setIsBiddingActive(activeCompanyData.isBiddingActive);
+        setActiveCompanyId(activeCompanyData.activeCompanyId);
+        setBidders(activeCompanyData.bidders);
+    }, [activeCompanyData]);
 
     useEffect(() => {
         if (!activeCompanyId) return
@@ -34,7 +33,7 @@ export default function OutlinedCard() {
             setActiveCompany(doc.data())
         });
         return () => unsubscribe();
-    }, [activeCompanyId])
+    }, [activeCompanyData])
 
     const updateteBiddingStatus = async (isBiddingActive) => {
         await updateDoc(doc(db, "controlData", "activeCompany"), {
@@ -54,9 +53,7 @@ export default function OutlinedCard() {
 
     const changeBiddingMargin = async (value) => {
         await updateDoc(doc(db, 'companies', activeCompanyId), {
-            biddingMargin: value,
-            bidders: {},
-            remainingVacancies: increment(Object.keys(activeCompany?.bidders).length)
+            biddingMargin: value
         })
 
         await updateDoc(doc(db, "controlData", "activeCompany"), {
@@ -146,7 +143,7 @@ export default function OutlinedCard() {
                         </Stack>
                     </Box>
                     <Divider />
-                    <Box sx={{ p: 2, backgroundColor: (activeCompany.bidders && (activeCompany.totalVacancies < Object.keys(activeCompany.bidders).length)) && "#FF6865" }}>
+                    <Box sx={{ p: 2, backgroundColor: (bidders && (activeCompany.remainingVacancies < Object.keys(bidders).length)) && "#FF6865" }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Typography gutterBottom fontSize={18} component="div" mb={0} >
                                 Vacancies Available
@@ -185,7 +182,7 @@ export default function OutlinedCard() {
                     <Box sx={{ p: 1 }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
 
-                            <Button variant="contained" disabled={isBiddingActive || !bidders ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2, width: '100%' }} onClick={handleBidSubmission}>Submit</Button>
+                            <Button variant="contained" disabled={isBiddingActive || !bidders || activeCompany.remainingVacancies < Object.keys(bidders).length ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2, width: '100%' }} onClick={handleBidSubmission}>Submit</Button>
 
                         </Stack>
                     </Box>
