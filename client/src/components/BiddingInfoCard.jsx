@@ -21,7 +21,6 @@ export default function OutlinedCard({ activeCompanyData }) {
     const [bidders, setBidders] = useState(activeCompanyData.bidders)
 
     useEffect(() => {
-        console.log(activeCompanyData)
         setIsBiddingActive(activeCompanyData.isBiddingActive);
         setActiveCompanyId(activeCompanyData.activeCompanyId);
         setBidders(activeCompanyData.bidders);

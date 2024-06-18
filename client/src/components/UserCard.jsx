@@ -35,7 +35,7 @@ export default function OutlinedCard() {
                 <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 0 }}>
                     <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }} src={userData.photoURL} />
                     <Typography variant="h6" component="div">
-                        {userData.displayName}
+                        {userData.userName}
                     </Typography>
                 </Box>
                 <Divider sx={{ mt: 2 }} />

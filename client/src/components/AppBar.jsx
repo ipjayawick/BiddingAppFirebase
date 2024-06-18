@@ -16,11 +16,10 @@ import GavelRoundedIcon from '@mui/icons-material/GavelRounded';
 import { AuthContext } from '../context/AuthContext';
 import { useContext } from 'react';
 
-function ResponsiveAppBar({ loginOnClick }) {
+function ResponsiveAppBar() {
 
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const { user, loading, googleSignIn, googleSignOut } = useContext(AuthContext)
-
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -61,7 +60,7 @@ function ResponsiveAppBar({ loginOnClick }) {
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                     <Typography variant="h6" component="div" color="white">
-                                        {user.displayName}
+                                        {user.userName}
                                     </Typography>
                                     <Avatar sx={{ ml: 2 }} src={user.photoURL} />
                                 </IconButton>

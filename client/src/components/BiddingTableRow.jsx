@@ -26,7 +26,6 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
     const [isRowEnabled, setIsRowEnabled] = useState(false)
 
     useEffect(() => {
-        console.log(activeCompanyData);
         setIsRowEnabled(activeCompanyData.activeCompanyId === company.companyId);
     }, [activeCompanyData, company]);
 

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -16,22 +15,12 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { db } from '../config/firebase';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { getDocs, collection, query, onSnapshot } from 'firebase/firestore';
-import { Button, Stack, TextField } from '@mui/material';
+import { collection, query, onSnapshot } from 'firebase/firestore';
+import { Stack, TextField } from '@mui/material';
 import UpdateUser from './UpdateUser';
 
-function createData(userId, userName, email, initialBiddingPoints, remainingBiddingPoints, companies) {
-    return {
-        userId,
-        userName,
-        email,
-        initialBiddingPoints,
-        remainingBiddingPoints,
-        companies
-    };
-}
 
-function Row({ row, updateUser }) {
+function Row({ user }) {
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -47,12 +36,12 @@ function Row({ row, updateUser }) {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {row.userName}
+                    {user.userName}
                 </TableCell>
-                <TableCell align="right">{row.email}</TableCell>
-                <TableCell align="right">{row.initialBiddingPoints}</TableCell>
-                <TableCell align="right">{row.remainingBiddingPoints}</TableCell>
-                <TableCell align="right">  <UpdateUser userData={row} /></TableCell>
+                <TableCell align="right">{user.email}</TableCell>
+                <TableCell align="right">{user.initialBiddingPoints}</TableCell>
+                <TableCell align="right">{user.remainingBiddingPoints}</TableCell>
+                <TableCell align="right">  <UpdateUser userData={user} /></TableCell>
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -69,7 +58,7 @@ function Row({ row, updateUser }) {
                                     </TableRow>
                                 </TableHead> */}
                                 <TableBody>
-                                    {row.companies?.map((company, index) => (
+                                    {user.companies?.map((company, index) => (
                                         <TableRow key={index}>
                                             <TableCell component="th" scope="row">
                                                 {company}
@@ -88,23 +77,18 @@ function Row({ row, updateUser }) {
 }
 
 export default function UserTable({ updateUser }) {
-    const [rows, setRows] = useState([])
+    const [users, setUsers] = useState([])
     const [search, setSearch] = useState('')
 
     const [loading, setLoading] = useState(true)
+
     useEffect(() => {
         const q = query(collection(db, "users"));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const updatedUsers = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const row = createData(doc.id, data.displayName, data.email, data.initialBiddingPoints, data.remainingBiddingPoints, data.companies);
-                updatedUsers.push(row);
-            });
-            setRows(updatedUsers);
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const userArr = snapshot.docs.map(doc => doc.data())
+            setUsers(userArr)
             setLoading(false)
         });
-
         return () => unsubscribe(); // Clean up the listener on unmount
     }, []);
 
@@ -128,10 +112,10 @@ export default function UserTable({ updateUser }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.
-                                filter((row) => search.toLowerCase() === '' ? true : row.userName.toLowerCase().startsWith(search)).
-                                map((row) => (
-                                    <Row key={row.userId} row={row} updateUser={updateUser} />
+                            {users.
+                                filter((user) => search.toLowerCase() === '' ? true : user.userName.toLowerCase().startsWith(search)).
+                                map((user, index) => (
+                                    <Row key={index} user={user} updateUser={updateUser} />
                                 ))}
                         </TableBody>
                     </Table>

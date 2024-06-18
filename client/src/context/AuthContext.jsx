@@ -22,7 +22,7 @@ const AuthContextProvider = ({ children }) => {
         } else {
           const userData = {
             userId: firebaseUser.uid,
-            displayName: firebaseUser.displayName,
+            userName: firebaseUser.displayName,
             email: firebaseUser.email,
             initialBiddingPoints: 100,
             remainingBiddingPoints: 100,

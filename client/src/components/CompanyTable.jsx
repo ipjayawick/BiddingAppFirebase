@@ -17,19 +17,8 @@ import { db } from '../config/firebase';
 import { Box, Stack, TextField, Typography, Button } from '@mui/material';
 import UpdateCompany from './UpdateCompany';
 import AddCompany from './AddCompany';
-function createData(companyId, companyName, description, totalVacancies, remainingVacancies, biddingMargin, bidders) {
-    return {
-        companyId,
-        companyName,
-        description,
-        totalVacancies,
-        remainingVacancies,
-        biddingMargin,
-        bidders
-    };
-}
 
-function Row({ row, deleteCompany, removeBidderFromCompany }) {
+function Row({ company, deleteCompany, removeBidderFromCompany }) {
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -45,17 +34,17 @@ function Row({ row, deleteCompany, removeBidderFromCompany }) {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {row.companyName}
+                    {company.companyName}
                 </TableCell>
-                <TableCell align="right">{row.description}</TableCell>
-                <TableCell align="right">{row.totalVacancies}</TableCell>
-                <TableCell align="right">{row.remainingVacancies}</TableCell>
-                <TableCell align="right">{row.biddingMargin}</TableCell>
+                <TableCell align="right">{company.description}</TableCell>
+                <TableCell align="right">{company.totalVacancies}</TableCell>
+                <TableCell align="right">{company.remainingVacancies}</TableCell>
+                <TableCell align="right">{company.biddingMargin}</TableCell>
                 <TableCell align="right">
-                    <UpdateCompany companyData={row} />
+                    <UpdateCompany companyData={company} />
                 </TableCell>
                 <TableCell align="right">
-                    <Button variant="contained" color="error" onClick={() => deleteCompany(row.companyId)}>Delete</Button>
+                    <Button variant="contained" color="error" onClick={() => deleteCompany(company.companyId)}>Delete</Button>
                 </TableCell>
             </TableRow>
             <TableRow>
@@ -74,14 +63,14 @@ function Row({ row, deleteCompany, removeBidderFromCompany }) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {row.bidders && Object.keys(row.bidders).map((bidder,index) => (
+                                    {company.bidders && Object.keys(company.bidders).map((bidder, index) => (
                                         <TableRow key={index}>
                                             <TableCell component="th" scope="row">
-                                                {row.bidders[bidder].userName}
+                                                {company.bidders[bidder].userName}
                                             </TableCell>
-                                            <TableCell>{row.bidders[bidder].userId}</TableCell>
+                                            <TableCell>{company.bidders[bidder].userId}</TableCell>
                                             <TableCell>
-                                                <Button variant="contained" color="error" onClick={() => removeBidderFromCompany(row.companyId, row.bidders[bidder].userId, row.companyName,row.biddingMargin)}>Remove</Button>
+                                                <Button variant="contained" color="error" onClick={() => removeBidderFromCompany(company, company.bidders[bidder].userId)}>Remove</Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -96,20 +85,16 @@ function Row({ row, deleteCompany, removeBidderFromCompany }) {
 }
 
 export default function CompnayTable() {
-    const [rows, setRows] = useState([])
+    const [companies, setCompanies] = useState([])
     const [search, setSearch] = useState('')
 
     const [loading, setLoading] = useState(true)
+
     useEffect(() => {
         const q = query(collection(db, "companies"));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const updatedCompanies = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const row = createData(doc.id, data.companyName, data.description, data.totalVacancies, data.remainingVacancies, data.biddingMargin, data.bidders);
-                updatedCompanies.push(row);
-            });
-            setRows(updatedCompanies);
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const companyArr = snapshot.docs.map(doc => ({ companyId: doc.id, ...doc.data(), }))
+            setCompanies(companyArr)
             setLoading(false)
         });
 
@@ -124,14 +109,14 @@ export default function CompnayTable() {
         }
     }
 
-    const removeBidderFromCompany = async (companyId, userId, companyName,biddingMargin) => {
+    const removeBidderFromCompany = async (company, userId) => {
         try {
-            await updateDoc(doc(db, "companies", companyId), {
+            await updateDoc(doc(db, "companies", company.companyId), {
                 [`bidders.${userId}`]: deleteField()
             })
             await updateDoc(doc(db, 'users', userId), {
-                companies: arrayRemove(companyName),
-                remainingBiddingPoints:increment(biddingMargin)
+                companies: arrayRemove(company.companyName),
+                remainingBiddingPoints: increment(company.biddingMargin)
             })
         } catch (error) {
             console.error('Error deleting bidder from company:', error)
@@ -167,10 +152,10 @@ export default function CompnayTable() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.
-                            filter((row) => search.toLowerCase() === '' ? true : row.companyName.toLowerCase().startsWith(search)).
-                            map((row) => (
-                                <Row key={row.companyId} row={row} deleteCompany={deleteCompany} removeBidderFromCompany={removeBidderFromCompany} />
+                        {companies.
+                            filter((company) => search.toLowerCase() === '' ? true : company.companyName.toLowerCase().startsWith(search)).
+                            map((company) => (
+                                <Row key={company.companyId} company={company} deleteCompany={deleteCompany} removeBidderFromCompany={removeBidderFromCompany} />
                             ))}
                     </TableBody>
                 </Table>

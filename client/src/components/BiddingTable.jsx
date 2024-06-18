@@ -42,7 +42,7 @@ export default function BiddingTable({ activeCompanyData }) {
   const addActiveCompanyBidders = async () => {
     const bidderObj = {
       userId: authUser.userId,
-      userName: authUser.displayName,
+      userName: authUser.userName,
       userRef: doc(db, "users", authUser.userId)
     }
     await updateDoc(doc(db, "controlData", "activeCompany"), {

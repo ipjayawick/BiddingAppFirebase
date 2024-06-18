@@ -1,16 +1,16 @@
 import React, { useContext } from 'react';
 import { getAuth } from "firebase/auth";
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import Button from '@mui/material/Button';
 import { AuthContext } from '../../context/AuthContext';
 import { Box, Typography, Container } from '@mui/material';
 const GoogleSignIn = () => {
-  const { user, loading, googleSignIn, googleSignOut } = useContext(AuthContext)
+  const { user, loading } = useContext(AuthContext)
 
   // const functions = getFunctions();
   // connectFunctionsEmulator(functions, "127.0.0.1", 5001);
   // const addMessage = httpsCallable(functions, 'addMessage');
-  const messageText = "hello"
+  // const messageText = "hello"
+
   const viewCurrentUser = () => {
     console.log(getAuth().currentUser)
   }
