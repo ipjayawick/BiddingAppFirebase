@@ -16,14 +16,14 @@ import UpdateBiddingMarginDialog from '../components/UpdateBiddingMarginDialog'
 
 export default function OutlinedCard({ activeCompanyData }) {
     const [activeCompany, setActiveCompany] = useState(null)
-    const [isBiddingActive, setIsBiddingActive] = useState(activeCompanyData.isBiddingActive);
-    const [activeCompanyId, setActiveCompanyId] = useState(activeCompanyData.activeCompanyId)
-    const [bidders, setBidders] = useState(activeCompanyData.bidders)
+    const [isBiddingActive, setIsBiddingActive] = useState(null);
+    const [activeCompanyId, setActiveCompanyId] = useState(null)
+    const [bidders, setBidders] = useState(null)
 
     useEffect(() => {
-        setIsBiddingActive(activeCompanyData.isBiddingActive);
-        setActiveCompanyId(activeCompanyData.activeCompanyId);
-        setBidders(activeCompanyData.bidders);
+        setIsBiddingActive(activeCompanyData?.isBiddingActive);
+        setActiveCompanyId(activeCompanyData?.activeCompanyId);
+        setBidders(activeCompanyData?.bidders);
     }, [activeCompanyData]);
 
     useEffect(() => {

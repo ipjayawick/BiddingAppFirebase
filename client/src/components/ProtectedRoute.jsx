@@ -8,7 +8,6 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     if (window.location.pathname === '/') {
-      console.log(user, loading)
       if (user && !loading) {
         navigate('/biddingPage')
       } else {
