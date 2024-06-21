@@ -58,7 +58,7 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
     }
 
     const handleBid = () => {
-        if (company.biddingMargin < authUser.remainingBiddingPoints) {
+        if (company.biddingMargin <= authUser.remainingBiddingPoints) {
             try {
                 addActiveCompanyBidders()
                 setBidButtonState(false)

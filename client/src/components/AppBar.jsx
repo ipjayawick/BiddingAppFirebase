@@ -66,7 +66,7 @@ function ResponsiveAppBar() {
                                 </IconButton>
                             </Tooltip>
                             <Menu
-                                sx={{ mt: '45px' }}
+                                sx={{ mt: '48px' }}
                                 id="menu-appbar"
                                 anchorEl={anchorElUser}
                                 anchorOrigin={{
@@ -81,15 +81,10 @@ function ResponsiveAppBar() {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                <MenuItem onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center" >Account</Typography>
-                                </MenuItem>
-                                <MenuItem onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center" >Dashboard</Typography>
-                                </MenuItem>
-                                <MenuItem onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center" onClick={() => googleSignOut()}>Log Out</Typography>
-                                </MenuItem>
+                                <Typography sx={{ px: 2, mt: 0, pt: 0 }} textAlign="center" >{user.email}</Typography>
+                                <Box display="flex" justifyContent="center" width="100%">
+                                    <Button textAlign="center" variant='outlined' sx={{ borderRadius: '50px',mt:1}} onClick={() => googleSignOut()}>Log Out</Button>
+                                </Box>
                             </Menu>
                         </>
                     ) : (
