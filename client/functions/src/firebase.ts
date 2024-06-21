@@ -1,9 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
-import { GoogleAuthProvider } from "firebase/auth";
-import { getFunctions,connectFunctionsEmulator  } from 'firebase/functions';
-import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCqv2Gz54PHkXgV5QunIX6JXySmzv0zx24",
@@ -15,9 +11,4 @@ const firebaseConfig = {
   measurementId: "G-1W0SCHEN5E"
 };
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-export const functions = getFunctions(app);
-connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 export const db = getFirestore(app);
-export const auth= getAuth(app)
-export const googleProvider = new GoogleAuthProvider();
