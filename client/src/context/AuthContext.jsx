@@ -11,35 +11,55 @@ const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(()=>console.log(user,loading,"-----"),[user,loading])
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setLoading(true);
       if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-        if (userDoc.exists()) {
-          // setUser({ ...firebaseUser, ...userDoc.data() });
-          setUser(userDoc.data());
-        } else {
-          const userData = {
-            userId: firebaseUser.uid,
-            userName: firebaseUser.displayName,
-            email: firebaseUser.email,
-            initialBiddingPoints: 100,
-            remainingBiddingPoints: 100,
-            createdAt: new Date(),
-            photoURL: firebaseUser.photoURL,
-            isAdmin: false
-          }
-          await setDoc(doc(db, 'users', firebaseUser.uid), userData);
-          setUser(userData);
+        console.log(firebaseUser,'firebaes user')
+        const userExists = await fetchUserDocument(firebaseUser.uid);
+        if (!userExists) {
+          waitForUserDocument(firebaseUser.uid);
         }
       } else {
+        console.log('no user')
         setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
+
+
+  const fetchUserDocument = async (uid) => {
+    console.log('hettting')
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    console.log('hetttinwwwg')
+    console.log(userDoc,'doc-0-----')
+    if (userDoc.exists()) {
+      setUser(userDoc.data());
+      setLoading(false);
+      return true;
+    }
+    return false;
+  };
+
+  const waitForUserDocument = async (uid) => {
+    let attempts = 0;
+    const maxAttempts = 5;
+    const delay = 1000; // 1 second
+
+    while (attempts < maxAttempts) {
+      const userExists = await fetchUserDocument(uid);
+      if (userExists) {
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, delay));
+      attempts++;
+    }
+    setLoading(false); // Handle case where document was not created within the expected time
+  };
+
 
   const googleSignIn = async () => {
     const auth = getAuth();
