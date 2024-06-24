@@ -83,7 +83,7 @@ function ResponsiveAppBar() {
                             >
                                 <Typography sx={{ px: 2, mt: 0, pt: 0 }} textAlign="center" >{user.email}</Typography>
                                 <Box display="flex" justifyContent="center" width="100%">
-                                    <Button textAlign="center" variant='outlined' sx={{ borderRadius: '50px',mt:1}} onClick={() => googleSignOut()}>Log Out</Button>
+                                    <Button variant='outlined' sx={{ borderRadius: '50px',mt:1, textAlign:"center"}} onClick={() => googleSignOut()}>Log Out</Button>
                                 </Box>
                             </Menu>
                         </>
