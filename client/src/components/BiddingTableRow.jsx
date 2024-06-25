@@ -30,7 +30,7 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
     }, [activeCompanyData, company]);
 
     useEffect(() => {
-        setBidButtonState(isRowEnabled && !authUser.isAdmin && activeCompanyData?.isBiddingActive && !authUser.companies.includes(company.companyName));
+        setBidButtonState(isRowEnabled && !authUser.isAdmin && activeCompanyData?.isBiddingActive && !authUser.companies?.includes(company.companyName));
     }, [isRowEnabled, authUser, activeCompanyData]);
 
     const handleEnableSwitchToggle = () => {
