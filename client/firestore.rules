@@ -1,0 +1,20 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Expiring rule to allow everyone to read/write for getting started
+    // match /{document=**} {
+    //   allow read, write: if request.time < timestamp.date(2024, 7, 2);
+    // }
+
+    // Allow only admin users to perform write operations
+    match /{document=**} {
+      allow write: if isAdminUser();
+      allow read: if true; // Allow everyone to read
+    }
+
+    function isAdminUser() {
+      return get(/databases/$(database)/documents/authData/adminUsers)
+      .data.userEmails.hasAny([request.auth.token.email]);
+    }
+
+  }
+}
