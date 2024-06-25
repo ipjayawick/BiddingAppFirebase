@@ -11,7 +11,7 @@ export default function AddCompany() {
     const [biddingMargin, setBiddingMargin] = useState('');
     const [totalVacancies, setTotalVacancies] = useState('');
     const [open, setOpen] = useState(false);
-    const {user}=useContext(AuthContext)
+    const { user } = useContext(AuthContext)
     const addCompany = httpsCallable(functions, 'addCompany');
 
     const handleSubmit = async (event) => {
