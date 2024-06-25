@@ -9,7 +9,18 @@ import { getFirestore } from "firebase-admin/firestore";
 initializeApp();
 const db = getFirestore()
 
+// export const test = onRequest({ cors: true }, async (request, response) => {
+
+//   // await db.collection('companies').add(companyData)
+//   // const data = await db.doc("authData/adminUsers").get()
+//   // console.log(data.data().userEmails.includes('ipjayawick@gmail.com'))
+
+// });
+
 export const registerNewUser = functions.auth.user().onCreate(async (user) => {
+  const data = await db.doc("authData/adminUsers").get()
+  const isAdmin = data.data().userEmails.includes(user.email)
+
   const userData = {
     userId: user.uid,
     userName: user.displayName,
@@ -18,12 +29,13 @@ export const registerNewUser = functions.auth.user().onCreate(async (user) => {
     remainingBiddingPoints: 100,
     createdAt: new Date(),
     photoURL: user.photoURL,
-    isAdmin: false
+    isAdmin: isAdmin
   };
+
   await db.doc(`users/${user.uid}`).set(userData)
 });
 
-export const addCompany = onRequest({cors:true},async (request, response) => {
+export const addCompany = onRequest({ cors: true }, async (request, response) => {
   const { companyName, description, totalVacancies, biddingMargin } = request.body.data;
   logger.info('Request received:', { body: request.body });
   const companyData = {
