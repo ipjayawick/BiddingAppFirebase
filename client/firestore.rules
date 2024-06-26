@@ -19,7 +19,7 @@ service cloud.firestore {
     function canAddToBiddersArray() {
       return 
       request.auth != null && 
-      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bidderrs'])) &&
+      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bidders'])) &&
       request.resource.data.bidders.size() == resource.data.bidders.size()+1 
     }
   }
