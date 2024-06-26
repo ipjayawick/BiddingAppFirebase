@@ -11,7 +11,7 @@ import Paper from '@mui/material/Paper';
 import { db } from '../config/firebase';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { collection, query, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { Stack, TextField } from '@mui/material';
 import PopupAlert from '../components/PopupAlert'
 import { useContext } from 'react';
@@ -45,8 +45,9 @@ export default function BiddingTable({ activeCompanyData }) {
       userName: authUser.userName,
       userRef: doc(db, "users", authUser.userId)
     }
+
     await updateDoc(doc(db, "controlData", "activeCompany"), {
-      [`bidders.${authUser.userId}`]: bidderObj
+      bidders: arrayUnion(bidderObj)
     })
   }
 

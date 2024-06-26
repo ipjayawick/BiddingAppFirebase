@@ -1,20 +1,42 @@
+rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Expiring rule to allow everyone to read/write for getting started
-    // match /{document=**} {
-    //   allow read, write: if request.time < timestamp.date(2024, 7, 2);
-    // }
 
-    // Allow only admin users to perform write operations
-    match /{document=**} {
-      allow write: if isAdminUser();
-      allow read: if true; // Allow everyone to read
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // allow create: if request.auth != null;
     }
 
-    function isAdminUser() {
-      return get(/databases/$(database)/documents/authData/adminUsers)
-      .data.userEmails.hasAny([request.auth.token.email]);
+    match /companies/{companyId} {
+      allow read: if request.auth != null;
     }
 
+    match /controlData/activeCompany {
+      allow read: if request.auth != null;
+      allow update: if canAddToBiddersArray()
+
+    function canAddToBiddersArray() {
+      return 
+      request.auth != null && 
+      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bidderrs'])) &&
+      request.resource.data.bidders.size() == resource.data.bidders.size()+1 
+    }
   }
+
+  match /authData/{data} {
+    allow read, write: if false;
+  }
+
+  match /{document=**} {
+    allow write: if isAdminUser();
+    allow read: if isAdminUser(); 
+  }
+
+
+  function isAdminUser() {
+    return get(/databases/$(database)/documents/authData/adminUsers)
+    .data.userEmails.hasAny([request.auth.token.email]);
+  }
+}
 }

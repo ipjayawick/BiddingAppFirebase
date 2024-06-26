@@ -2,13 +2,10 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
-import Avatar from '@mui/material/Avatar';
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { Button, List, ListItem, ListItemText } from '@mui/material';
-import { arrayRemove, arrayUnion, collection, deleteField, doc, getDoc, getDocs, increment, onSnapshot, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, collection, doc, getDocs, increment, onSnapshot, updateDoc, writeBatch } from 'firebase/firestore';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { db } from '../config/firebase';
@@ -21,6 +18,7 @@ export default function OutlinedCard({ activeCompanyData }) {
     const [bidders, setBidders] = useState(null)
 
     useEffect(() => {
+        bidders?.forEach((bidder, index)=>console.log(bidder,index))
         setIsBiddingActive(activeCompanyData?.isBiddingActive);
         setActiveCompanyId(activeCompanyData?.activeCompanyId);
         setBidders(activeCompanyData?.bidders);
@@ -41,9 +39,10 @@ export default function OutlinedCard({ activeCompanyData }) {
     };
 
     const removeBidderFromCompany = async (userId) => {
+        console.log(...bidders.filter(bidder=>bidder.userId==userId))
         try {
             await updateDoc(doc(db, "controlData", "activeCompany"), {
-                [`bidders.${userId}`]: deleteField()
+                bidders: arrayRemove(...bidders.filter(bidder=>bidder.userId==userId))
             })
         } catch (error) {
             console.error('Error deleting bidder from company:', error)
@@ -56,7 +55,7 @@ export default function OutlinedCard({ activeCompanyData }) {
         })
 
         await updateDoc(doc(db, "controlData", "activeCompany"), {
-            bidders: deleteField()
+            bidders: []
         })
     }
 
@@ -64,10 +63,10 @@ export default function OutlinedCard({ activeCompanyData }) {
         if (!bidders) return
         await updateDoc(doc(db, "companies", activeCompanyId), {
             bidders,
-            remainingVacancies: increment(-Object.keys(bidders).length)
+            remainingVacancies: increment(-bidders.length)
         })
         await updateDoc(doc(db, "controlData", "activeCompany"), {
-            bidders: deleteField()
+            bidders: []
         })
         try {
             const batch = writeBatch(db);
@@ -142,7 +141,7 @@ export default function OutlinedCard({ activeCompanyData }) {
                         </Stack>
                     </Box>
                     <Divider />
-                    <Box sx={{ p: 2, backgroundColor: (bidders && (activeCompany.remainingVacancies < Object.keys(bidders).length)) && "#FF6865" }}>
+                    <Box sx={{ p: 2, backgroundColor: (bidders && (activeCompany.remainingVacancies < bidders.length)) && "#FF6865" }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Typography gutterBottom fontSize={18} component="div" mb={0} >
                                 Vacancies Available
@@ -159,16 +158,16 @@ export default function OutlinedCard({ activeCompanyData }) {
                                 Live Bidders
                             </Typography>
                             <Typography gutterBottom fontSize={18} component="div">
-                                {bidders ? Object.keys(bidders).length : null}
+                                {bidders ? bidders.length : null}
                             </Typography>
                         </Stack>
                         <Stack spacing={1}>
                             <List sx={{ pt: 0 }}>
-                                {bidders && Object.keys(bidders).map((bidder, index) => (
+                                {bidders && bidders.map((bidder, index) => (
                                     <React.Fragment key={index}>
                                         <ListItem sx={{ py: 0, pt: 1 }}>
-                                            <ListItemText primary={bidders[bidder].userName} />
-                                            <Button variant="contained" disabled={isBiddingActive ? true : false} color="error" size='small' onClick={() => removeBidderFromCompany(bidders[bidder].userId)}>Remove</Button>
+                                            <ListItemText primary={bidder.userName} />
+                                            <Button variant="contained" disabled={isBiddingActive ? true : false} color="error" size='small' onClick={() => removeBidderFromCompany(bidder.userId)}>Remove</Button>
                                         </ListItem>
                                         <Divider variant="middle" component="li" />
                                     </React.Fragment>
@@ -181,7 +180,7 @@ export default function OutlinedCard({ activeCompanyData }) {
                     <Box sx={{ p: 1 }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
 
-                            <Button variant="contained" disabled={isBiddingActive || !bidders || activeCompany.remainingVacancies < Object.keys(bidders).length ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2, width: '100%' }} onClick={handleBidSubmission}>Submit</Button>
+                            <Button variant="contained" disabled={isBiddingActive || !bidders || activeCompany.remainingVacancies < bidders.length ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2, width: '100%' }} onClick={handleBidSubmission}>Submit</Button>
 
                         </Stack>
                     </Box>

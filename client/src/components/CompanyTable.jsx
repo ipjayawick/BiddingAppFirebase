@@ -12,7 +12,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { arrayRemove, collection, deleteDoc, deleteField, doc, increment, onSnapshot, query, updateDoc } from 'firebase/firestore';
+import { arrayRemove, collection, deleteDoc, doc, increment, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Box, Stack, TextField, Typography, Button } from '@mui/material';
 import UpdateCompany from './UpdateCompany';
@@ -63,14 +63,14 @@ function Row({ company, deleteCompany, removeBidderFromCompany }) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {company.bidders && Object.keys(company.bidders).map((bidder, index) => (
+                                    {company.bidders && company.bidders.map((bidder, index) => (
                                         <TableRow key={index}>
                                             <TableCell component="th" scope="row">
-                                                {company.bidders[bidder].userName}
+                                                {bidder.userName}
                                             </TableCell>
-                                            <TableCell>{company.bidders[bidder].userId}</TableCell>
+                                            <TableCell>{bidder.userId}</TableCell>
                                             <TableCell>
-                                                <Button variant="contained" color="error" onClick={() => removeBidderFromCompany(company, company.bidders[bidder].userId)}>Remove</Button>
+                                                <Button variant="contained" color="error" onClick={() => removeBidderFromCompany(company, bidder.userId)}>Remove</Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -112,7 +112,7 @@ export default function CompnayTable() {
     const removeBidderFromCompany = async (company, userId) => {
         try {
             await updateDoc(doc(db, "companies", company.companyId), {
-                [`bidders.${userId}`]: deleteField()
+                bidders: arrayRemove(...company.bidders.filter(bidder=>bidder.userId==userId))
             })
             await updateDoc(doc(db, 'users', userId), {
                 companies: arrayRemove(company.companyName),

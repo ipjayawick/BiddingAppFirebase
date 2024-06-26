@@ -26,7 +26,7 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
     const [isRowEnabled, setIsRowEnabled] = useState(false)
 
     useEffect(() => {
-        setIsRowEnabled(activeCompanyData.activeCompanyId === company.companyId);
+        setIsRowEnabled(activeCompanyData?.activeCompanyId === company.companyId);
     }, [activeCompanyData, company]);
 
     useEffect(() => {
@@ -50,7 +50,8 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
             await setDoc(doc(db, "controlData", "activeCompany"), {
                 activeCompanyId: companyId,
                 companyRef,
-                isBiddingActive: false
+                isBiddingActive: false,
+                bidders:[]
             });
         } catch (error) {
             console.error('Error updating control data:', error);
