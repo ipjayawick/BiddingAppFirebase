@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { db } from '../../config/firebase';
-import { updateDoc, doc, increment, arrayUnion, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Container } from '@mui/material';

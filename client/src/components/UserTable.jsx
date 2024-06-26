@@ -51,19 +51,12 @@ function Row({ user }) {
                                 Companies
                             </Typography>
                             <Table size="small" aria-label="purchases">
-                                {/* <TableHead>
-                                    <TableRow>
-                                        <TableCell>Company</TableCell>
-                                        <TableCell>ID</TableCell>
-                                    </TableRow>
-                                </TableHead> */}
                                 <TableBody>
                                     {user.companies?.map((company, index) => (
                                         <TableRow key={index}>
                                             <TableCell component="th" scope="row">
                                                 {company}
                                             </TableCell>
-                                            {/* <TableCell>{"companiesRow.companyId"}</TableCell> */}
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -89,7 +82,7 @@ export default function UserTable({ updateUser }) {
             setUsers(userArr)
             setLoading(false)
         });
-        return () => unsubscribe(); // Clean up the listener on unmount
+        return () => unsubscribe();
     }, []);
 
     if (!loading) {

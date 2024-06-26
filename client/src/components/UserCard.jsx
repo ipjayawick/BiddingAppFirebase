@@ -12,9 +12,10 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { db } from '../config/firebase';
+
 export default function OutlinedCard() {
     const { user } = useContext(AuthContext);
-    const [userData, setUserData] = useState(null); // Initialize userData with an empty object
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
         if (user) {
@@ -23,9 +24,9 @@ export default function OutlinedCard() {
             });
             return () => unsubscribe();
         }
-    }, [user]); // Add user to the dependency array
+    }, [user]);
 
-    if (userData===null) {
+    if (userData === null) {
         return <div>Loading...</div>;
     }
 

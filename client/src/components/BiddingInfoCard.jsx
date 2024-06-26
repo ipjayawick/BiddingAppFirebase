@@ -18,7 +18,7 @@ export default function OutlinedCard({ activeCompanyData }) {
     const [bidders, setBidders] = useState(null)
 
     useEffect(() => {
-        bidders?.forEach((bidder, index)=>console.log(bidder,index))
+        bidders?.forEach((bidder, index) => console.log(bidder, index))
         setIsBiddingActive(activeCompanyData?.isBiddingActive);
         setActiveCompanyId(activeCompanyData?.activeCompanyId);
         setBidders(activeCompanyData?.bidders);
@@ -38,11 +38,11 @@ export default function OutlinedCard({ activeCompanyData }) {
         })
     };
 
-    const removeBidderFromCompany = async (userId) => {
-        console.log(...bidders.filter(bidder=>bidder.userId==userId))
+    const removeLiveBidder = async (userId) => {
+        console.log(...bidders.filter(bidder => bidder.userId == userId))
         try {
             await updateDoc(doc(db, "controlData", "activeCompany"), {
-                bidders: arrayRemove(...bidders.filter(bidder=>bidder.userId==userId))
+                bidders: arrayRemove(...bidders.filter(bidder => bidder.userId == userId))
             })
         } catch (error) {
             console.error('Error deleting bidder from company:', error)
@@ -61,28 +61,38 @@ export default function OutlinedCard({ activeCompanyData }) {
 
     const handleBidSubmission = async () => {
         if (!bidders) return
-        await updateDoc(doc(db, "companies", activeCompanyId), {
-            bidders,
-            remainingVacancies: increment(-bidders.length)
-        })
-        await updateDoc(doc(db, "controlData", "activeCompany"), {
-            bidders: []
-        })
+
         try {
             const batch = writeBatch(db);
+
+            //add bidders to the company entity
+            batch.update(doc(db, "companies", activeCompanyId), {
+                bidders,
+                remainingVacancies: increment(-bidders.length)
+            })
+
+            //add companies to users entities
             const querySnapshot = await getDocs(collection(db, 'users'));
+            const activeBiddersIds = bidders.map(bidder => bidder.userId)
 
             querySnapshot.forEach((docSnapshot) => {
                 const docRef = doc(db, 'users', docSnapshot.id);
-                batch.update(docRef, {
-                    remainingBiddingPoints: increment(-activeCompany.biddingMargin),
-                    'companies': arrayUnion(activeCompany.companyName)
-                });
+                if (activeBiddersIds.includes(docSnapshot.id)) {
+                    batch.update(docRef, {
+                        remainingBiddingPoints: increment(-activeCompany.biddingMargin),
+                        'companies': arrayUnion(activeCompany.companyName)
+                    });
+                }
             });
+
+            //clear live bidders
+            batch.update(doc(db, "controlData", "activeCompany"), {
+                bidders: []
+            })
 
             await batch.commit();
         } catch (error) {
-            console.error('Error updating documents: ', error);
+            console.error('Error submitting the bid: ', error);
         }
     }
 
@@ -167,7 +177,7 @@ export default function OutlinedCard({ activeCompanyData }) {
                                     <React.Fragment key={index}>
                                         <ListItem sx={{ py: 0, pt: 1 }}>
                                             <ListItemText primary={bidder.userName} />
-                                            <Button variant="contained" disabled={isBiddingActive ? true : false} color="error" size='small' onClick={() => removeBidderFromCompany(bidder.userId)}>Remove</Button>
+                                            <Button variant="contained" disabled={isBiddingActive ? true : false} color="error" size='small' onClick={() => removeLiveBidder(bidder.userId)}>Remove</Button>
                                         </ListItem>
                                         <Divider variant="middle" component="li" />
                                     </React.Fragment>

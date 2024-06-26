@@ -1,8 +1,8 @@
 import React from 'react';
-import AddCompany from '../../components/AddCompany'
 import CompanyTable from '../../components/CompanyTable';
 import UserTable from '../../components/UserTable';
-import { Box, Container, Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
+
 function AdminPage() {
   return (
     <Box mx={3} mt={5}>

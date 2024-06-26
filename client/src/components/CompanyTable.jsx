@@ -12,7 +12,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { arrayRemove, collection, deleteDoc, doc, increment, onSnapshot, query, updateDoc } from 'firebase/firestore';
+import { arrayRemove, collection, deleteDoc, doc, increment, onSnapshot, query, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Box, Stack, TextField, Typography, Button } from '@mui/material';
 import UpdateCompany from './UpdateCompany';
@@ -98,7 +98,7 @@ export default function CompnayTable() {
             setLoading(false)
         });
 
-        return () => unsubscribe(); // Clean up the listener on unmount
+        return () => unsubscribe();
     }, []);
 
     const deleteCompany = async (companyId) => {
@@ -111,15 +111,21 @@ export default function CompnayTable() {
 
     const removeBidderFromCompany = async (company, userId) => {
         try {
-            await updateDoc(doc(db, "companies", company.companyId), {
-                bidders: arrayRemove(...company.bidders.filter(bidder=>bidder.userId==userId))
+            const batch = writeBatch(db);
+
+            batch.update(doc(db, "companies", company.companyId), {
+                bidders: arrayRemove(...company.bidders.filter(bidder => bidder.userId == userId)),
+                remainingVacancies: increment(1)
             })
-            await updateDoc(doc(db, 'users', userId), {
+
+            batch.update(doc(db, 'users', userId), {
                 companies: arrayRemove(company.companyName),
                 remainingBiddingPoints: increment(company.biddingMargin)
             })
+
+            await batch.commit();
         } catch (error) {
-            console.error('Error deleting bidder from company:', error)
+            console.error('Error removing bidder from company:', error)
         }
     }
 
@@ -146,7 +152,7 @@ export default function CompnayTable() {
                             <TableCell align="right">Description</TableCell>
                             <TableCell align="right">Total Vacancies</TableCell>
                             <TableCell align="right">Remaining Vancies</TableCell>
-                            <TableCell align="right">Bidding Points</TableCell>
+                            <TableCell align="right">Bidding Margin</TableCell>
                             <TableCell align="right">Update</TableCell>
                             <TableCell align="right">Delete</TableCell>
                         </TableRow>

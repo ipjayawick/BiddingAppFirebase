@@ -1,33 +1,28 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { addDoc, collection } from 'firebase/firestore';
-import { db, functions } from '../config/firebase';
-import { httpsCallable } from 'firebase/functions';
-import { AuthContext } from '../context/AuthContext';
-import { getAuth } from 'firebase/auth';
+import { db } from '../config/firebase';
+
 export default function AddCompany() {
     const [companyName, setCompanyName] = useState('');
     const [description, setDescription] = useState('');
     const [biddingMargin, setBiddingMargin] = useState('');
     const [totalVacancies, setTotalVacancies] = useState('');
+
     const [open, setOpen] = useState(false);
-    const { user } = useContext(AuthContext)
-    const addCompany = httpsCallable(functions, 'addCompany');
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(getAuth())
         try {
-            const result = await addCompany({
+            await addDoc(collection(db, "companies",), {
                 companyName,
                 description,
                 totalVacancies: +totalVacancies,
                 remainingVacancies: +totalVacancies,
                 biddingMargin: +biddingMargin
             });
-            console.log(result)
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Error adding company to Firestore:', error);
         }
         handleClose()
     };

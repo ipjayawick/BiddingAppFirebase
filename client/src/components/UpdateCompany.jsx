@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export default function UpdateCompany({ companyData }) {
@@ -22,8 +22,6 @@ export default function UpdateCompany({ companyData }) {
         }
     }, [companyData]);
 
-
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -34,7 +32,7 @@ export default function UpdateCompany({ companyData }) {
                 biddingMargin: +biddingMargin
             });
         } catch (error) {
-            console.error('Error adding company to Firestore:', error);
+            console.error('Error updating company:', error);
         }
         setOpen(false)
     };

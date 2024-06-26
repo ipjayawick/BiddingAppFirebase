@@ -17,6 +17,7 @@ export default function FormDialog({ open, handleClose, currentMargin, changeBid
             handleClose();
         }
     };
+
     return (
         <React.Fragment>
             <Dialog
