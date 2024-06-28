@@ -18,24 +18,24 @@ const initializeGoogleSheets = async () => {
   }
 };
 
-// Get metadata about the spreadsheet
-export const getMetaData = async () => {
-  await initializeGoogleSheets();
-  const metaData = await googleSheets.spreadsheets.get({
-    spreadsheetId,
-  });
-  return metaData.data;
-};
+// // Get metadata about the spreadsheet
+// export const getMetaData = async () => {
+//   await initializeGoogleSheets();
+//   const metaData = await googleSheets.spreadsheets.get({
+//     spreadsheetId,
+//   });
+//   return metaData.data;
+// };
 
-// Read rows from the spreadsheet
-export const getRows = async () => {
-  await initializeGoogleSheets();
-  const rows = await googleSheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: "Sheet1!A:A",
-  });
-  return rows.data.values;
-};
+// // Read rows from the spreadsheet
+// export const getRows = async () => {
+//   await initializeGoogleSheets();
+//   const rows = await googleSheets.spreadsheets.values.get({
+//     spreadsheetId,
+//     range: "Sheet1!A:A",
+//   });
+//   return rows.data.values;
+// };
 
 // Write rows to the spreadsheet
 export const appendRows = async (values) => {

@@ -10,12 +10,15 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { db } from '../config/firebase';
 import UpdateBiddingMarginDialog from '../components/UpdateBiddingMarginDialog'
+import { getFunctions, httpsCallable } from "firebase/functions";
+const functions = getFunctions();
+const handleSubmission = httpsCallable(functions, 'handleBidSubmission');
 
 export default function OutlinedCard({ activeCompanyData }) {
     const [activeCompany, setActiveCompany] = useState(null)
 
     useEffect(() => {
-        if (!activeCompanyData.activeCompanyId) return
+        if (!activeCompanyData?.activeCompanyId) return
         const unsubscribe = onSnapshot(doc(db, "companies", activeCompanyData.activeCompanyId), async (doc) => {
             setActiveCompany(doc.data())
         });
@@ -52,34 +55,35 @@ export default function OutlinedCard({ activeCompanyData }) {
         if (!activeCompanyData.bidders) return
 
         try {
-            const batch = writeBatch(db);
+            const res = await handleSubmission()
+            // const batch = writeBatch(db);
 
-            //add bidders to the company entity
-            batch.update(doc(db, "companies", activeCompanyData.activeCompanyId), {
-                bidders: activeCompanyData.bidders,
-                remainingVacancies: increment(-activeCompanyData.bidders.length)
-            })
+            // //add bidders to the company entity
+            // batch.update(doc(db, "companies", activeCompanyData.activeCompanyId), {
+            //     bidders: activeCompanyData.bidders,
+            //     remainingVacancies: increment(-activeCompanyData.bidders.length)
+            // })
 
-            //add companies to users entities
-            const querySnapshot = await getDocs(collection(db, 'users'));
-            const activeBiddersIds = activeCompanyData.bidders.map(bidder => bidder.userId)
+            // //add companies to users entities
+            // const querySnapshot = await getDocs(collection(db, 'users'));
+            // const activeBiddersIds = activeCompanyData.bidders.map(bidder => bidder.userId)
 
-            querySnapshot.forEach((docSnapshot) => {
-                const docRef = doc(db, 'users', docSnapshot.id);
-                if (activeBiddersIds.includes(docSnapshot.id)) {
-                    batch.update(docRef, {
-                        remainingBiddingPoints: increment(-activeCompany.biddingMargin),
-                        'companies': arrayUnion(activeCompany.companyName)
-                    });
-                }
-            });
+            // querySnapshot.forEach((docSnapshot) => {
+            //     const docRef = doc(db, 'users', docSnapshot.id);
+            //     if (activeBiddersIds.includes(docSnapshot.id)) {
+            //         batch.update(docRef, {
+            //             remainingBiddingPoints: increment(-activeCompany.biddingMargin),
+            //             'companies': arrayUnion(activeCompany.companyName)
+            //         });
+            //     }
+            // });
 
-            //clear live bidders
-            batch.update(doc(db, "controlData", "activeCompany"), {
-                bidders: []
-            })
+            // //clear live bidders
+            // batch.update(doc(db, "controlData", "activeCompany"), {
+            //     bidders: []
+            // })
 
-            await batch.commit();
+            // await batch.commit();
         } catch (error) {
             console.error('Error submitting the bid: ', error);
         }
