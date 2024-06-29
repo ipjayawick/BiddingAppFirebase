@@ -38,14 +38,43 @@ const initializeGoogleSheets = async () => {
 // };
 
 // Write rows to the spreadsheet
-export const appendRows = async (values) => {
+export const appendRows = async (sheet, values) => {
   await initializeGoogleSheets();
   await googleSheets.spreadsheets.values.append({
     spreadsheetId,
-    range: "Sheet1!A:B",
+    range: `${sheet}!A:B`,
     valueInputOption: "USER_ENTERED",
     resource: {
       values: values,
     },
   });
-};
+}
+
+//add sheet
+export const addSheet = async (title, rowCount, columnCount) => {
+  await initializeGoogleSheets();
+  const request = {
+    spreadsheetId: spreadsheetId,
+    resource: {
+      requests: [
+        {
+          addSheet: {
+            properties: {
+              title: title,
+              gridProperties: {
+                rowCount: rowCount,
+                columnCount: columnCount
+              }
+            }
+          }
+        }
+      ]
+    },
+    auth: auth
+  };
+
+  await googleSheets.spreadsheets.batchUpdate(request, (err, response) => {
+    if (err) return console.error('The API returned an error: ' + err);
+    console.log('Sheet added:', response.data);
+  });
+}

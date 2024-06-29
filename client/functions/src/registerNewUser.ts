@@ -20,6 +20,7 @@ export const registerNewUser = functions.auth.user().onCreate(async (user) => {
       createdAt: new Date(),
       photoURL: user.photoURL,
       isAdmin: isAdmin,
+      companies:[]
     };
 
     await db.doc(`users/${user.uid}`).set(userData);

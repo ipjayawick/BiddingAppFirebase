@@ -19,7 +19,8 @@ export default function AddCompany() {
                 description,
                 totalVacancies: +totalVacancies,
                 remainingVacancies: +totalVacancies,
-                biddingMargin: +biddingMargin
+                biddingMargin: +biddingMargin,
+                bidders:[]
             });
         } catch (error) {
             console.error('Error adding company to Firestore:', error);
