@@ -10,8 +10,7 @@ export const app = getApps()[0] || initializeApp({})
 const db = getFirestore()
 
 // Write rows to the spreadsheet
-export const backupUsers = onRequest({ cors: true }, async (req, res) => {
-
+export const backupUsers = async () => {
     //get users from database
     const keysToExtract = ["userId", "userName", "initialBiddingPoints", "remainingBiddingPoints", "companies"]
     const columnNames = ["User ID", "User Name", "Initial Bidding Points", "Remaining Bidding Points", "Companies"]
@@ -35,5 +34,4 @@ export const backupUsers = onRequest({ cors: true }, async (req, res) => {
     await addSheet(sheetName, 200, 10)
     await new Promise(resolve => setTimeout(resolve, 2000));
     await appendRows(sheetName, rowArray)
-});
-
+}
