@@ -37,6 +37,43 @@ const initializeGoogleSheets = async () => {
 //   return rows.data.values;
 // };
 
+// //Get existing sheet
+// export const sheetExists = (sheetTitle) => {
+//   try {
+//     const response = await googleSheets.spreadsheets.get({ spreadsheetId: spreadsheetId });
+//     const sheetExists = response.data.sheets.some(sheet => sheet.properties.title === sheetTitle);
+//     return sheetExists
+//   } catch (err) {
+//     console.error('Error:', err);
+//     return false
+//   }
+// }
+
+export const clearSheetData = async (sheetName) => {
+  try {
+    await initializeGoogleSheets();
+    // Get the sheet ID
+    const spreadsheet = await googleSheets.spreadsheets.get({ spreadsheetId: spreadsheetId });
+    const sheet = spreadsheet.data.sheets.find(sheet => sheet.properties.title === sheetName);
+
+    if (!sheet) {
+      console.log(`Sheet "${sheetName}" does not exist.`);
+      return;
+    }
+
+    const request = {
+      spreadsheetId: spreadsheetId,
+      range: sheetName
+    };
+
+    await sheets.spreadsheets.values.clear(request);
+    console.log(`Cleared data from sheet: ${sheetName}`);
+  } catch (err) {
+    console.error('Error clearing sheet data:', err);
+    throw err
+  }
+}
+
 // Write rows to the spreadsheet
 export const appendRows = async (sheet, values) => {
   await initializeGoogleSheets();

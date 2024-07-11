@@ -51,7 +51,7 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
                 activeCompanyId: companyId,
                 companyRef,
                 isBiddingActive: false,
-                bidders:[]
+                bidders: []
             });
         } catch (error) {
             console.error('Error updating control data:', error);
@@ -59,6 +59,7 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
     }
 
     const handleBid = () => {
+        console.log(company.biddingMargin, authUser.remainingBiddingPoints)
         if (company.biddingMargin <= authUser.remainingBiddingPoints) {
             try {
                 addActiveCompanyBidders()

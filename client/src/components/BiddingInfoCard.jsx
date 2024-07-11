@@ -52,8 +52,7 @@ export default function OutlinedCard({ activeCompanyData }) {
     }
 
     const handleBidSubmission = async () => {
-        if (!activeCompanyData.bidders) return
-
+        if (!activeCompanyData.bidders || activeCompanyData.bidders.length == 0) return
         try {
             const res = await handleSubmission()
         } catch (error) {
