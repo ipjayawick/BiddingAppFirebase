@@ -3,28 +3,12 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import Avatar from '@mui/material/Avatar';
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { List, ListItem, ListItemText } from '@mui/material';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { db } from '../config/firebase';
 
-export default function OutlinedCard() {
-    const { user } = useContext(AuthContext);
-    const [userData, setUserData] = useState(null);
 
-    useEffect(() => {
-        if (user) {
-            const unsubscribe = onSnapshot(doc(db, "users", user.userId), (doc) => {
-                setUserData(doc.data());
-            });
-            return () => unsubscribe();
-        }
-    }, [user]);
+export default function OutlinedCard({ userData }) {
 
     if (userData === null) {
         return <div>Loading...</div>;
