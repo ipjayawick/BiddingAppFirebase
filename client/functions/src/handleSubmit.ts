@@ -17,6 +17,7 @@ export const handleBidSubmission = onRequest({ cors: true }, async (request, res
         console.log("No live bidders")
         response.status(204).send({ message: "No live bidders!" })
     }
+
     const activeCompanyData = await db.doc(`companies/${liveCompanyId}`).get()
     const activeCompany = activeCompanyData.data() //active company
 

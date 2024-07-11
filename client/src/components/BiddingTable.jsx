@@ -14,15 +14,12 @@ import { useEffect } from 'react';
 import { collection, query, onSnapshot, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { Stack, TextField } from '@mui/material';
 import PopupAlert from '../components/PopupAlert'
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
 import Row from '../components/BiddingTableRow'
 
-export default function BiddingTable({ activeCompanyData }) {
+export default function BiddingTable({ activeCompanyData, userData }) {
   const [companies, setCompanies] = useState([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
-  const { user: authUser } = useContext(AuthContext)
   const [alertOpen, setAlertOpen] = useState(false)
 
   useEffect(() => {
@@ -41,9 +38,9 @@ export default function BiddingTable({ activeCompanyData }) {
 
   const addActiveCompanyBidders = async () => {
     const bidderObj = {
-      userId: authUser.userId,
-      userName: authUser.userName,
-      userRef: doc(db, "users", authUser.userId)
+      userId: userData.userId,
+      userName: userData.userName,
+      userRef: doc(db, "users", userData.userId)
     }
 
     await updateDoc(doc(db, "controlData", "activeCompany"), {
@@ -59,7 +56,6 @@ export default function BiddingTable({ activeCompanyData }) {
     setAlertOpen(false);
   };
 
-
   //error, warning, info, success
   if (!loading) {
     return (
@@ -74,7 +70,7 @@ export default function BiddingTable({ activeCompanyData }) {
             <Table aria-label="collapsible table">
               <TableHead>
                 <TableRow>
-                  {authUser.isAdmin && (
+                  {userData.isAdmin && (
                     <>
                       <TableCell />
                       <TableCell />
@@ -92,7 +88,7 @@ export default function BiddingTable({ activeCompanyData }) {
                 {companies.
                   filter((company) => search.toLowerCase() === '' ? true : company.companyName.toLowerCase().startsWith(search)).
                   map((company) => (
-                    <Row key={company.companyId} addActiveCompanyBidders={addActiveCompanyBidders} setAlertOpen={setAlertOpen} company={company} activeCompanyData={activeCompanyData} />
+                    <Row key={company.companyId} addActiveCompanyBidders={addActiveCompanyBidders} setAlertOpen={setAlertOpen} company={company} activeCompanyData={activeCompanyData} userData={userData}/>
                   ))}
               </TableBody>
             </Table>

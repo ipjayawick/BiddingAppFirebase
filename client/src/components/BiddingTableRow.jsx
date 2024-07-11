@@ -14,14 +14,11 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { Button } from '@mui/material';
 import Switch from '../components/Switch'
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
-export default function Row({ addActiveCompanyBidders, setAlertOpen, company, activeCompanyData }) {
+export default function Row({ addActiveCompanyBidders, setAlertOpen, company, activeCompanyData, userData }) {
     const [open, setOpen] = useState(false);
-    const { user: authUser } = useContext(AuthContext)
     const [bidButtonState, setBidButtonState] = useState(false)
     const [isRowEnabled, setIsRowEnabled] = useState(false)
 
@@ -30,8 +27,8 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
     }, [activeCompanyData, company]);
 
     useEffect(() => {
-        setBidButtonState(isRowEnabled && !authUser.isAdmin && activeCompanyData?.isBiddingActive && !authUser.companies?.includes(company.companyName));
-    }, [isRowEnabled, authUser, activeCompanyData]);
+        setBidButtonState(isRowEnabled && !userData.isAdmin && activeCompanyData?.isBiddingActive && !userData.companies?.includes(company.companyName));
+    }, [isRowEnabled, userData, activeCompanyData]);
 
     const handleEnableSwitchToggle = () => {
         if (isRowEnabled) {
@@ -75,7 +72,7 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
     return (
         <React.Fragment>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: isRowEnabled ? "lightgreen" : "null" }}>
-                {authUser.isAdmin && (
+                {userData.isAdmin && (
                     <>
                         <TableCell sx={{ pr: 0 }}>
                             <Switch handleChange={handleEnableSwitchToggle} enabled={isRowEnabled} />
@@ -103,7 +100,7 @@ export default function Row({ addActiveCompanyBidders, setAlertOpen, company, ac
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        {authUser.isAdmin && (
+                        {userData.isAdmin && (
                             <Box sx={{ margin: 1 }}>
                                 <Typography variant="h6" gutterBottom component="div">
                                     Bidders
