@@ -1,11 +1,15 @@
 import React from 'react';
-import AddCompany from '../../components/AddCompany'
 import CompanyTable from '../../components/CompanyTable';
 import UserTable from '../../components/UserTable';
-import { Box, Container, Grid } from '@mui/material';
+import { Box, Button, Grid } from '@mui/material';
+import { getFunctions, httpsCallable } from "firebase/functions";
+const functions = getFunctions();
+const backupToExcel = httpsCallable(functions, 'backupToExcel');
+
 function AdminPage() {
   return (
-    <Box mx={3} mt={5}>
+    <Box mx={3} mt={3}>
+      <Button variant='contained' sx={{ mb: 2 }} onClick={() => backupToExcel()}>Backup All to Excel</Button>
       <Grid container spacing={3}>
         <Grid item xs={6}>
           <CompanyTable />

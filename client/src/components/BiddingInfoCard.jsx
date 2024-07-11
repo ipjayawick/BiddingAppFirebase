@@ -10,23 +10,16 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { db } from '../config/firebase';
 import UpdateBiddingMarginDialog from '../components/UpdateBiddingMarginDialog'
+import { getFunctions, httpsCallable } from "firebase/functions";
+const functions = getFunctions();
+const handleSubmission = httpsCallable(functions, 'handleBidSubmission');
 
 export default function OutlinedCard({ activeCompanyData }) {
     const [activeCompany, setActiveCompany] = useState(null)
-    const [isBiddingActive, setIsBiddingActive] = useState(null);
-    const [activeCompanyId, setActiveCompanyId] = useState(null)
-    const [bidders, setBidders] = useState(null)
 
     useEffect(() => {
-        bidders?.forEach((bidder, index)=>console.log(bidder,index))
-        setIsBiddingActive(activeCompanyData?.isBiddingActive);
-        setActiveCompanyId(activeCompanyData?.activeCompanyId);
-        setBidders(activeCompanyData?.bidders);
-    }, [activeCompanyData]);
-
-    useEffect(() => {
-        if (!activeCompanyId) return
-        const unsubscribe = onSnapshot(doc(db, "companies", activeCompanyId), async (doc) => {
+        if (!activeCompanyData?.activeCompanyId) return
+        const unsubscribe = onSnapshot(doc(db, "companies", activeCompanyData.activeCompanyId), async (doc) => {
             setActiveCompany(doc.data())
         });
         return () => unsubscribe();
@@ -38,11 +31,10 @@ export default function OutlinedCard({ activeCompanyData }) {
         })
     };
 
-    const removeBidderFromCompany = async (userId) => {
-        console.log(...bidders.filter(bidder=>bidder.userId==userId))
+    const removeLiveBidder = async (userId) => {
         try {
             await updateDoc(doc(db, "controlData", "activeCompany"), {
-                bidders: arrayRemove(...bidders.filter(bidder=>bidder.userId==userId))
+                bidders: arrayRemove(...activeCompanyData.bidders.filter(bidder => bidder.userId == userId))
             })
         } catch (error) {
             console.error('Error deleting bidder from company:', error)
@@ -50,7 +42,7 @@ export default function OutlinedCard({ activeCompanyData }) {
     }
 
     const changeBiddingMargin = async (value) => {
-        await updateDoc(doc(db, 'companies', activeCompanyId), {
+        await updateDoc(doc(db, 'companies', activeCompanyData.activeCompanyId), {
             biddingMargin: value
         })
 
@@ -60,29 +52,11 @@ export default function OutlinedCard({ activeCompanyData }) {
     }
 
     const handleBidSubmission = async () => {
-        if (!bidders) return
-        await updateDoc(doc(db, "companies", activeCompanyId), {
-            bidders,
-            remainingVacancies: increment(-bidders.length)
-        })
-        await updateDoc(doc(db, "controlData", "activeCompany"), {
-            bidders: []
-        })
+        if (!activeCompanyData.bidders || activeCompanyData.bidders.length == 0) return
         try {
-            const batch = writeBatch(db);
-            const querySnapshot = await getDocs(collection(db, 'users'));
-
-            querySnapshot.forEach((docSnapshot) => {
-                const docRef = doc(db, 'users', docSnapshot.id);
-                batch.update(docRef, {
-                    remainingBiddingPoints: increment(-activeCompany.biddingMargin),
-                    'companies': arrayUnion(activeCompany.companyName)
-                });
-            });
-
-            await batch.commit();
+            const res = await handleSubmission()
         } catch (error) {
-            console.error('Error updating documents: ', error);
+            console.error('Error submitting the bid: ', error);
         }
     }
 
@@ -98,7 +72,7 @@ export default function OutlinedCard({ activeCompanyData }) {
 
 
 
-    if (activeCompany === null || activeCompanyId === null) {
+    if (activeCompany === null || activeCompanyData.activeCompanyId === null) {
         return (
             <>
                 <Typography variant="h4" mb={2.5}>Active Company</Typography>
@@ -120,10 +94,10 @@ export default function OutlinedCard({ activeCompanyData }) {
 
                         <Button
                             variant="contained"
-                            color={isBiddingActive ? "error" : "success"}
-                            onClick={() => updateteBiddingStatus(!isBiddingActive)}
+                            color={activeCompanyData.isBiddingActive ? "error" : "success"}
+                            onClick={() => updateteBiddingStatus(!activeCompanyData.isBiddingActive)}
                         >
-                            {isBiddingActive ? "Stop Bidding" : "Start Bidding"}
+                            {activeCompanyData.isBiddingActive ? "Stop Bidding" : "Start Bidding"}
                         </Button>
                     </Stack>
                 </Box>
@@ -134,14 +108,14 @@ export default function OutlinedCard({ activeCompanyData }) {
                             <Typography gutterBottom fontSize={18} component="div" mb={0}>
                                 Bidding Margin
                             </Typography>
-                            <Button variant="contained" disabled={isBiddingActive ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2 }} onClick={handleClickOpen}>Change</Button>
+                            <Button variant="contained" disabled={activeCompanyData.isBiddingActive ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2 }} onClick={handleClickOpen}>Change</Button>
                             <Typography gutterBottom fontSize={18} component="div" mb={0}>
                                 {activeCompany?.biddingMargin}
                             </Typography>
                         </Stack>
                     </Box>
                     <Divider />
-                    <Box sx={{ p: 2, backgroundColor: (bidders && (activeCompany.remainingVacancies < bidders.length)) && "#FF6865" }}>
+                    <Box sx={{ p: 2, backgroundColor: (activeCompanyData.bidders && (activeCompany.remainingVacancies < activeCompanyData.bidders.length)) && "#FF6865" }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Typography gutterBottom fontSize={18} component="div" mb={0} >
                                 Vacancies Available
@@ -158,16 +132,16 @@ export default function OutlinedCard({ activeCompanyData }) {
                                 Live Bidders
                             </Typography>
                             <Typography gutterBottom fontSize={18} component="div">
-                                {bidders ? bidders.length : null}
+                                {activeCompanyData.bidders ? activeCompanyData.bidders.length : null}
                             </Typography>
                         </Stack>
                         <Stack spacing={1}>
                             <List sx={{ pt: 0 }}>
-                                {bidders && bidders.map((bidder, index) => (
+                                {activeCompanyData.bidders && activeCompanyData.bidders.map((bidder, index) => (
                                     <React.Fragment key={index}>
                                         <ListItem sx={{ py: 0, pt: 1 }}>
                                             <ListItemText primary={bidder.userName} />
-                                            <Button variant="contained" disabled={isBiddingActive ? true : false} color="error" size='small' onClick={() => removeBidderFromCompany(bidder.userId)}>Remove</Button>
+                                            <Button variant="contained" disabled={activeCompanyData.isBiddingActive ? true : false} color="error" size='small' onClick={() => removeLiveBidder(bidder.userId)}>Remove</Button>
                                         </ListItem>
                                         <Divider variant="middle" component="li" />
                                     </React.Fragment>
@@ -180,7 +154,7 @@ export default function OutlinedCard({ activeCompanyData }) {
                     <Box sx={{ p: 1 }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
 
-                            <Button variant="contained" disabled={isBiddingActive || !bidders || activeCompany.remainingVacancies < bidders.length ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2, width: '100%' }} onClick={handleBidSubmission}>Submit</Button>
+                            <Button variant="contained" disabled={activeCompanyData.isBiddingActive || !activeCompanyData.bidders || activeCompany.remainingVacancies < activeCompanyData.bidders.length ? true : false} color="primary" sx={{ marginLeft: "auto", marginRight: 2, width: '100%' }} onClick={handleBidSubmission}>Submit</Button>
 
                         </Stack>
                     </Box>

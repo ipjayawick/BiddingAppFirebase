@@ -7,16 +7,16 @@ import { googleProvider } from "../config/firebase";
 
 const AuthContext = createContext(null);
 
-const AuthContextProvider = ({ children }) => {
+const AuthContextProvider = ({ children }) => { 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(()=>console.log(user,loading,"-----"),[user,loading])
+  useEffect(() => console.log(user, loading, "-----"), [user, loading])
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setLoading(true);
       if (firebaseUser) {
-        console.log(firebaseUser,'firebaes user')
+        console.log(firebaseUser, 'firebaes user')
         const userExists = await fetchUserDocument(firebaseUser.uid);
         if (!userExists) {
           waitForUserDocument(firebaseUser.uid);
@@ -29,13 +29,12 @@ const AuthContextProvider = ({ children }) => {
     });
     return () => unsubscribe();
   }, []);
-
-
+  
   const fetchUserDocument = async (uid) => {
     console.log('hettting')
     const userDoc = await getDoc(doc(db, 'users', uid));
     console.log('hetttinwwwg')
-    console.log(userDoc,'doc-0-----')
+    console.log(userDoc, 'doc-0-----')
     if (userDoc.exists()) {
       setUser(userDoc.data());
       setLoading(false);
@@ -59,7 +58,6 @@ const AuthContextProvider = ({ children }) => {
     }
     setLoading(false); // Handle case where document was not created within the expected time
   };
-
 
   const googleSignIn = async () => {
     const auth = getAuth();

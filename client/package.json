@@ -7,13 +7,18 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "shell":"npm --prefix ./functions run shell",
+    "functions:build":"npm --prefix ./functions run build:watch",
+    "functions:serve":"npm --prefix ./functions run serve",
+    "functions":"concurrently \"npm run functions:build\" \"npm run functions:serve\""
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.19",
     "@mui/material": "^5.15.19",
+    "concurrently": "^8.2.2",
     "firebase": "^10.12.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
