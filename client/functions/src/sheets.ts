@@ -66,7 +66,7 @@ export const clearSheetData = async (sheetName) => {
       range: sheetName
     };
 
-    await sheets.spreadsheets.values.clear(request);
+    await googleSheets.spreadsheets.values.clear(request);
     console.log(`Cleared data from sheet: ${sheetName}`);
   } catch (err) {
     console.error('Error clearing sheet data:', err);

@@ -13,9 +13,11 @@ export const handleBidSubmission = onRequest({ cors: true }, async (request, res
     const liveCompany = liveCompanyData.data() //control data
     const liveCompanyId = liveCompany?.activeCompanyId
     const liveBidderIds = liveCompany?.bidders.map(bidder => bidder.userId)
-    if (!liveBidderIds) {
+    // console.log(liveBidderIds)
+    if (!liveBidderIds || liveBidderIds.length == 0) {
         console.log("No live bidders")
         response.status(204).send({ message: "No live bidders!" })
+        return
     }
 
     const activeCompanyData = await db.doc(`companies/${liveCompanyId}`).get()
@@ -25,22 +27,22 @@ export const handleBidSubmission = onRequest({ cors: true }, async (request, res
         const batch = db.batch();
 
         //add bidders to the company entity
-        console.log(liveCompany?.bidders,"yoooo")
-        // batch.update(db.doc(`companies/${liveCompanyId}`), {
-        //     bidders: FieldValue.arrayUnion(...liveCompany?.bidders),
-        //     remainingVacancies: FieldValue.increment(-liveCompany?.bidders.length)
-        // })
+        // console.log(liveCompany?.bidders, "yoooo")
+        batch.update(db.doc(`companies/${liveCompanyId}`), {
+            bidders: FieldValue.arrayUnion(...liveCompany?.bidders),
+            remainingVacancies: FieldValue.increment(-liveCompany?.bidders.length)
+        })
 
         //add companies to users entities
         const querySnapshot = await db.collection('users').get()
 
         querySnapshot.forEach((docSnapshot) => {
             if (liveBidderIds.includes(docSnapshot.id)) {
-                console.log(activeCompany?.companyName,"hooo")
-                // batch.update(db.doc(`users/${docSnapshot.id}`), {
-                //     remainingBiddingPoints: FieldValue.increment(-activeCompany?.biddingMargin),
-                //     companies: FieldValue.arrayUnion(activeCompany?.companyName)
-                // });
+                // console.log(activeCompany?.companyName, "hooo")
+                batch.update(db.doc(`users/${docSnapshot.id}`), {
+                    remainingBiddingPoints: FieldValue.increment(-activeCompany?.biddingMargin),
+                    companies: FieldValue.arrayUnion(activeCompany?.companyName)
+                });
             }
         });
 
