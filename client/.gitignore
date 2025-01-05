@@ -27,3 +27,4 @@ dist-ssr
 
 **/credentials.json
 firestore.rules*
+**/config/firebase.js
